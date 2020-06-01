@@ -1,0 +1,35 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Fetch all history for all tags and branches
+      run: git fetch --prune --unshallow
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.3
+      with:
+        versionSpec: '5.2.x'
+    - name: Use GitVersion
+      id: gitversion # step id used as reference for output values
+      uses: gittools/actions/gitversion/execute@v0.9.3
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.201
+    - name: Build with dotnet
+      run: dotnet build --configuration Release -p:Version=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+    - name: Test with dotnet
+      run: dotnet test --configuration Release --no-build
+    - uses: actions/upload-artifact@v2
+      with:
+        name: nuget
+        path: "**/Kontent.Statiq*.nupkg"
+    outputs: 
+      nugetversion: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
+      prerelease: ${{ steps.gitversion.outputs.preReleaseTag != '' }}

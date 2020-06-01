@@ -1,0 +1,21 @@
+name: Publish to Nuget
+on:
+  release:
+    types: [published] # When a release is published, push the Nuget package to nuget.org
+
+jobs:
+  publish:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download artifact
+      run: wget -nv ${{ github.event.release.assets[0].browser_download_url }}
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.201
+    - name: Publish package
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: dotnet nuget push ${{ github.event.release.assets[0].name }} --api-key $NUGET_API_KEY -s https://api.nuget.org/v3/index.json

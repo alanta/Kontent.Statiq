@@ -42,6 +42,11 @@ namespace Kontent.Statiq
         /// <returns>The module.</returns>
         public static Kontent OrderBy(this Kontent module, string field, SortOrder sortOrder)
         {
+            if (!field.StartsWith("elements") && !field.StartsWith("system"))
+            {
+                field = "elements." + field;
+            }
+
             module.QueryParameters.Add(new OrderParameter(field, (Kentico.Kontent.Delivery.Abstractions.SortOrder)sortOrder));
             return module;
         }

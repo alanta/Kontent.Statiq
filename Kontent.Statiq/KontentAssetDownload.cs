@@ -4,16 +4,21 @@ using System.Collections.Generic;
 
 namespace Kontent.Statiq
 {
+    /*
     /// <summary>
     /// Downloads all Kontent assets found in input documents.
     /// The downloaded assets can then be processed with modules such as <see cref="WriteFiles"/>.
     /// URLs are supplied with the <see cref="WithUris"/> method.
     /// </summary>
-    /*public class KontentAssetDownload : Download, IModule
+    public class KontentAssetDownload : ReadWeb
     {
-        private DocumentConfig UriDocConfig;
+        public KontentAssetDownload() : base()
+        {
+            
+        }
+        private Config<string> UriDocConfig;
 
-        public KontentAssetDownload WithUris(DocumentConfig uris)
+        public KontentAssetDownload WithUris(Config<string> uris)
         {
             UriDocConfig = uris;
             return this;
@@ -31,5 +36,6 @@ namespace Kontent.Statiq
 
             return base.Execute(inputs, context);
         }
-    }*/
+    }
+    */
 }

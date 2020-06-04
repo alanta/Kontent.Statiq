@@ -1,11 +1,17 @@
 ﻿namespace Kontent.Statiq
 {
     /// <summary>
-    /// Sort order of content items retrieved from Kentico Cloud.
+    /// Sort order of content items retrieved from Kontent.
     /// </summary>
     public enum SortOrder
     {
-        Ascending = 0,
-        Descending = 1,
+        /// <summary>
+        /// Sort from low to high.
+        /// </summary>
+        Ascending = Kentico.Kontent.Delivery.Abstractions.SortOrder.Ascending,
+        /// <summary>
+        /// Sort from high to low.
+        /// </summary>
+        Descending = Kentico.Kontent.Delivery.Abstractions.SortOrder.Descending,
     }
 }

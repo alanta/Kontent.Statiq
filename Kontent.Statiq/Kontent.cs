@@ -13,45 +13,58 @@ namespace Kontent.Statiq
     /// <summary>
     /// Retrieves content items from Kontent.
     /// </summary>
-    public class Kontent : Module
+    public sealed class Kontent : Module
     {
+        /// <summary>
+        /// The preview API key to use. Set this if you want to use preview (unpublished) content./>.
+        /// </summary>
         public string PreviewApiKey { get; set; }
+        
+        /// <summary>
+        /// The production API key to use. Set either this key if you don't want preview content and have secured your API (paid subscribtion required)./>.
+        /// </summary>
         public string ProductionApiKey { get; set; }
+        
+        /// <summary>
+        /// The Kontent project id. This is required.
+        /// </summary>
         public string ProjectId { get; }
+        
+        /// <summary>
+        /// The code name of the field uses to fill the main Content field on the Statiq document. This is mostly useful for untyped content.
+        /// </summary>
         public string ContentField { get; set; }
-        public string UrlField { get; set; }
-        protected readonly Lazy<IDeliveryClient> Client;
-        internal List<Action<IOptionalClientSetup>> ConfigureClientActions = new List<Action<IOptionalClientSetup>>();
-        public List<IQueryParameter> QueryParameters { get; } = new List<IQueryParameter>();
 
+        private readonly Lazy<IDeliveryClient> _client;
+        
+        internal List<Action<IOptionalClientSetup>> ConfigureClientActions = new List<Action<IOptionalClientSetup>>();
+        internal List<IQueryParameter> QueryParameters { get; } = new List<IQueryParameter>();
+
+        /// <summary>
+        /// Create a new instance of the Kontent module for Statiq using an existing Kontent client.
+        /// </summary>
+        /// <param name="client">The Kontent client to use.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="client"/> is null.</exception>
         public Kontent(IDeliveryClient client)
         {
             if( client == null )
-                throw new ArgumentNullException($"{nameof(client)} must not be null");
+                throw new ArgumentNullException(nameof(client), $"{nameof(client)} must not be null");
 
-            Client = new Lazy<IDeliveryClient>(() => client);
+            _client = new Lazy<IDeliveryClient>(() => client);
         }
 
         /// <summary>
-        /// Specifies the project ID to use for retrieving content items from Kentico Cloud.
-        /// <seealso cref="!:https://developer.Kontent.com/docs/using-delivery-api#section-getting-project-id" />
+        /// Create a new instance of the Kontent module for Statiq.
         /// </summary>
-        /// <param name="projectId">Kentico Cloud project ID</param>
-        public Kontent(string projectId) : this(projectId, string.Empty)
+        /// <param name="projectId">Kontent project ID</param>
+        /// <param name="previewApiKey">The preview API key (optional)</param>
+        public Kontent(string projectId, string previewApiKey = null)
         {
-            
-        }
-
-        /// <summary>
-        /// Specifies the project ID to use for retrieving content items from Kentico Cloud.
-        /// <seealso cref="!:https://developer.Kontent.com/docs/using-delivery-api#section-getting-project-id" />
-        /// </summary>
-        /// <param name="projectId">Kentico Cloud project ID</param>
-        public Kontent(string projectId, string previewApiKey)
-        {
+            if (string.IsNullOrWhiteSpace(projectId))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(projectId));
             ProjectId = projectId;
             PreviewApiKey = previewApiKey;
-            Client = new Lazy<IDeliveryClient>(CreateClient);
+            _client = new Lazy<IDeliveryClient>(CreateClient);
         }
 
         private IDeliveryClient CreateClient()
@@ -83,9 +96,10 @@ namespace Kontent.Statiq
             return builder.Build();
         }
 
+        /// <inheritdoc />
         protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
         {
-            var items = await Client.Value.GetItemsAsync(QueryParameters);
+            var items = await _client.Value.GetItemsAsync(QueryParameters);
 
             var documentTasks = items.Items.Select(item => CreateDocument(context, item)).ToArray();
 
@@ -94,7 +108,7 @@ namespace Kontent.Statiq
             return documentTasks.Select(t => t.Result);
         }
 
-        protected async Task<IDocument> CreateDocument(IExecutionContext context, ContentItem item)
+        private async Task<IDocument> CreateDocument(IExecutionContext context, ContentItem item)
         {
             var metadata = new List<KeyValuePair<string, object>>
             {
@@ -116,11 +130,6 @@ namespace Kontent.Statiq
                     default:
                         if (DefaultElementParser.TryParseMetadata(element, out metadataItem))
                         {
-                            if (string.Equals(metadataItem.Key, UrlField))
-                            {
-                                metadata.Add(new KeyValuePair<string, object>("url", metadataItem.Value));
-                            }
-
                             metadata.Add(metadataItem);
                         }
                         break;

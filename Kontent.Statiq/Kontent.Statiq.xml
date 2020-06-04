@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Kontent.Statiq</name>
+    </assembly>
+    <members>
+        <member name="T:Kontent.Statiq.Html.HtmlHelpers">
+            <summary>
+            Helper methods to aid with Razor templates
+            </summary>
+        </member>
+        <member name="T:Kontent.Statiq.Kontent">
+            <summary>
+            Retrieves content items from Kontent.
+            </summary>
+        </member>
+        <member name="P:Kontent.Statiq.Kontent.PreviewApiKey">
+            <summary>
+            The preview API key to use. Set this if you want to use preview (unpublished) content./>.
+            </summary>
+        </member>
+        <member name="P:Kontent.Statiq.Kontent.ProductionApiKey">
+            <summary>
+            The production API key to use. Set either this key if you don't want preview content and have secured your API (paid subscribtion required)./>.
+            </summary>
+        </member>
+        <member name="P:Kontent.Statiq.Kontent.ProjectId">
+            <summary>
+            The Kontent project id. This is required.
+            </summary>
+        </member>
+        <member name="P:Kontent.Statiq.Kontent.ContentField">
+            <summary>
+            The code name of the field uses to fill the main Content field on the Statiq document. This is mostly useful for untyped content.
+            </summary>
+        </member>
+        <member name="M:Kontent.Statiq.Kontent.#ctor(Kentico.Kontent.Delivery.Abstractions.IDeliveryClient)">
+            <summary>
+            Create a new instance of the Kontent module for Statiq using an existing Kontent client.
+            </summary>
+            <param name="client">The Kontent client to use.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="client"/> is null.</exception>
+        </member>
+        <member name="M:Kontent.Statiq.Kontent.#ctor(System.String,System.String)">
+            <summary>
+            Create a new instance of the Kontent module for Statiq.
+            </summary>
+            <param name="projectId">Kontent project ID</param>
+            <param name="previewApiKey">The preview API key (optional)</param>
+        </member>
+        <member name="M:Kontent.Statiq.Kontent.ExecuteContextAsync(Statiq.Common.IExecutionContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Kontent.Statiq.KontentAssetParser">
+            <summary>
+            Parses document content by replacing <c>!!assets/</c> paths with Kentico Cloud asset URLs.
+            URLs are matched by the file name of the asset.
+            </summary>
+        </member>
+        <member name="T:Kontent.Statiq.KontentLocalAssetParser">
+            <summary>
+            Parses document content by replacing <c>!!local-assets/</c> paths with URLs to downloaded assets.
+            URLs are matched by the file name of the asset.
+            </summary>
+        </member>
+        <member name="T:Kontent.Statiq.KontentModuleConfiguration">
+            <summary>
+            Extension methods to configure the Kontent.Statiq module.
+            </summary>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithContentType(Kontent.Statiq.Kontent,System.String)">
+            <summary>
+            Sets the content type to retrieve.
+            </summary>
+            <param name="module"></param>
+            <param name="contentType">Code name of the content type to retrieve. This for untyped content only.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithContentField(Kontent.Statiq.Kontent,System.String)">
+            <summary>
+            Sets the main content field. This is mostly useful for untyped content.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="field">Field code name, this is case sensitive</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.OrderBy(Kontent.Statiq.Kontent,System.String,Kontent.Statiq.SortOrder)">
+            <summary>
+            Sets the ordering for retrieved content items.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="field">Field to order by</param>
+            <param name="sortOrder">Sort order</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.Skip(Kontent.Statiq.Kontent,System.Int32)">
+            <summary>
+            Skip the specified number of items. Use this with Limit to page the results.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="skip">The number of items to skip.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.Limit(Kontent.Statiq.Kontent,System.Int32)">
+            <summary>
+            Set the maximum number of items to return. Use this with Skip to page the results.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="limit">The maximum number of items to return.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithQuery(Kontent.Statiq.Kontent,Kentico.Kontent.Delivery.Abstractions.IQueryParameter[])">
+            <summary>
+            Add Kontent query parameters.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="queryParameters"></param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithTypeProvider(Kontent.Statiq.Kontent,Kentico.Kontent.Delivery.Abstractions.ITypeProvider)">
+            <summary>
+            Set the content provider instance to use. 
+            </summary>
+            <param name="module">The module.</param>
+            <param name="typeProvider">The type provider to use.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithTypeProvider``1(Kontent.Statiq.Kontent)">
+            <summary>
+            Set the content provider to use. The provider must have a default constructor.
+            </summary>
+            <param name="module">The module.</param>
+            <typeparam name="TTypeProvider">The type of the type provider to use.</typeparam>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithInlineItemResolver``1(Kontent.Statiq.Kontent,Kentico.Kontent.Delivery.Abstractions.InlineContentItems.IInlineContentItemsResolver{``0})">
+            <summary>
+            Add an inline item resolver for the specified content type.
+            </summary>
+            <typeparam name="TContentType">The content type for which this resolver is used.</typeparam>
+            <param name="module">The module.</param>
+            <param name="resolver">The content resolver instance.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithInlineItemResolver``2(Kontent.Statiq.Kontent)">
+            <summary>
+            Add an inline item resolver for the specified content type.
+            </summary>
+            <typeparam name="TContentType">The content type for which this resolver is used.</typeparam>
+            <typeparam name="TResolver">The type of the content resolver to use. Must have a default constructor.</typeparam>
+            <param name="module">The module.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithProductionApiKey(Kontent.Statiq.Kontent,System.String)">
+            <summary>
+            Use the specified production API key. This disables the preview API key if that was configured earlier.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="apiKey">The API key. You can find this key in the Kontent portal.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="M:Kontent.Statiq.KontentModuleConfiguration.WithPreviewApiKey(Kontent.Statiq.Kontent,System.String)">
+            <summary>
+            Use the specified preview API key. This disables a production API key if that was configured earlier.
+            </summary>
+            <param name="module">The module.</param>
+            <param name="apiKey">The API key. You can find this key in the Kontent portal.</param>
+            <returns>The module.</returns>
+        </member>
+        <member name="T:Kontent.Statiq.Metadata.AssetElementParser">
+            <summary>
+            Parses content item assets as a <see cref="T:System.Collections.Generic.List`1">List&lt;Asset&gt;</see>.
+            </summary>
+        </member>
+        <member name="T:Kontent.Statiq.SortOrder">
+            <summary>
+            Sort order of content items retrieved from Kontent.
+            </summary>
+        </member>
+        <member name="F:Kontent.Statiq.SortOrder.Ascending">
+            <summary>
+            Sort from low to high.
+            </summary>
+        </member>
+        <member name="F:Kontent.Statiq.SortOrder.Descending">
+            <summary>
+            Sort from high to low.
+            </summary>
+        </member>
+        <member name="T:Kontent.Statiq.TypedContentExtensions">
+            <summary>
+            Extensions for working with typed content.
+            </summary>
+        </member>
+        <member name="F:Kontent.Statiq.TypedContentExtensions.KontentItemKey">
+            <summary>
+            The key used in Statiq documents to store the Kontent item.
+            </summary>
+        </member>
+        <member name="M:Kontent.Statiq.TypedContentExtensions.AsKontent``1(Statiq.Common.IDocument)">
+            <summary>
+            Return the strong typed model for a Statiq document.
+            </summary>
+            <param name="document">The Document.</param>
+            <typeparam name="TModel">The type of content to return.</typeparam>
+            <returns>The strong typed content model.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when this method is called on a document that doesn't a Kontent content item.</exception>
+        </member>
+    </members>
+</doc>

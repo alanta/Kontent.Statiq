@@ -17,7 +17,7 @@ namespace Kontent.Statiq
         /// <returns></returns>
         public static Kontent WithContentType(this Kontent module, string contentType)
         {
-            module.QueryParameters.Add(new EqualsFilter("system.type", contentType));
+            module.QueryParameters.Add( new SystemTypeEqualsFilter(contentType) );
             return module;
         }
 

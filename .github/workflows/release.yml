@@ -70,7 +70,7 @@ jobs:
           release_name: Release ${{ needs.build.outputs.nugetversion }}
           draft: true
           prerelease: ${{ needs.build.outputs.prerelease }}
-      - name: Upload Release Asset : Nuget package
+      - name: Upload Release Asset - Nuget package
         id: upload-release-asset1
         uses: actions/upload-release-asset@v1
         env:
@@ -80,7 +80,7 @@ jobs:
           asset_path: "./${{ needs.build.outputs.packagefile }}"
           asset_name: ${{ needs.build.outputs.packagefile }}
           asset_content_type: application/zip
-      - name: Upload Release Asset : Nuget symbols package
+      - name: Upload Release Asset - Nuget symbols package
         id: upload-release-asset2
         uses: actions/upload-release-asset@v1
         env:

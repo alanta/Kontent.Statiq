@@ -14,12 +14,18 @@ namespace Kontent.Statiq
     {
         private string _folderPath = string.Empty;
 
+        /// <summary>
+        /// Set the base folder for local assets.
+        /// </summary>
+        /// <param name="folderPath">The path to the local asset folder.</param>
+        /// <returns>The module.</returns>
         public KontentLocalAssetParser WithFolderPath(string folderPath)
         {
             _folderPath = folderPath + "/";
             return this;
         }
 
+        /// <inheritdoc/>
         protected override async Task<IEnumerable<IDocument>> ExecuteInputAsync(IDocument input, IExecutionContext context)
         {
             var content = await input.GetContentStringAsync();

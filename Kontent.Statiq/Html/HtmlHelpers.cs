@@ -11,6 +11,12 @@ namespace Kontent.Statiq.Html
     /// </summary>
     public static class HtmlHelpers
     {
+        /// <summary>
+        /// Get the first asset url from a document using the code name. This is intended for untyped content.
+        /// </summary>
+        /// <param name="document">The Statiq document.</param>
+        /// <param name="codename">The codename of the field that holds the asset.</param>
+        /// <returns>The asset url or an empty string if not available.</returns>
         public static string GetFirstAssetUrl(this IDocument document, string codename)
         {
             if (document == null)
@@ -22,6 +28,13 @@ namespace Kontent.Statiq.Html
             return assets != null && assets.Any() ? assets[0].Url : string.Empty;
         }
 
+        /// <summary>
+        /// Get the first asset url from a document for assets that are stored locally using the code name. This is intended for untyped content.
+        /// </summary>
+        /// <param name="document">The Statiq document.</param>
+        /// <param name="codename">The codename of the field that holds the asset.</param>
+        /// <param name="folderPath">The folder where local assets are stored.</param>
+        /// <returns>The asset url or an empty string if not available.</returns>
         public static string GetFirstAssetLocalUrl(this IDocument document, string codename, string folderPath = "")
         {
             var assetUrl = GetFirstAssetUrl(document, codename);

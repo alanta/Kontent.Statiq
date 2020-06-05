@@ -5,8 +5,16 @@ using System.Linq;
 
 namespace Kontent.Statiq
 {
+    /// <summary>
+    /// Helpers to handle assets in untyped content.
+    /// </summary>
     public static class KontentAssetHelper
     {
+        /// <summary>
+        /// Get all the assets uris in a Statiq document.
+        /// </summary>
+        /// <param name="doc">The document.</param>
+        /// <returns>All the urls for assets in the document.</returns>
         public static string[] GetAssetUris(IDocument doc)
         {
             var assetUrls = new List<string>();

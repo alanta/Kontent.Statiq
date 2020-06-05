@@ -10,6 +10,12 @@ namespace Kontent.Statiq.Metadata
     /// </summary>
     public static class AssetElementParser
     {
+        /// <summary>
+        /// Try to parse assets in a content item.
+        /// </summary>
+        /// <param name="element">The element</param>
+        /// <param name="metadata">The metadata to store the asset in.</param>
+        /// <returns><c>true</c> if assets were processed.</returns>
         public static bool TryParseMetadata(dynamic element, out KeyValuePair<string, object> metadata)
         {
             if (element.Value == null || !((IEnumerable<object>) element.Value.value).Any())

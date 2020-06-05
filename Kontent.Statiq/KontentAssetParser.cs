@@ -1,8 +1,5 @@
-﻿using AngleSharp.Dom;
-using Kontent.Statiq.Models;
+﻿using Kontent.Statiq.Models;
 using Statiq.Common;
-using Statiq.Html;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +13,7 @@ namespace Kontent.Statiq
     /// </summary>
     public class KontentAssetParser : Module
     {
+        /// <inheritdoc/>
         protected override async Task<IEnumerable<IDocument>> ExecuteInputAsync(IDocument input, IExecutionContext context)
         {
             var content = await input.GetContentStringAsync();

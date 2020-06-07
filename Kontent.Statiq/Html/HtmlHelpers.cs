@@ -1,4 +1,5 @@
-﻿using Kontent.Statiq.Models;
+﻿using Kentico.Kontent.Delivery.Abstractions;
+using Kentico.Kontent.Delivery.ImageTransformation;
 using Statiq.Common;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,11 @@ namespace Kontent.Statiq.Html
     /// </summary>
     public static class HtmlHelpers
     {
+        public static ImageUrlBuilder ImageUrl(this Asset asset)
+        {
+            return new ImageUrlBuilder(asset.Url);
+        }
+
         /// <summary>
         /// Get the first asset url from a document using the code name. This is intended for untyped content.
         /// </summary>
@@ -24,8 +30,8 @@ namespace Kontent.Statiq.Html
                 return string.Empty;
             }
 
-            var assets = document.Get<List<Asset>>(codename);
-            return assets != null && assets.Any() ? assets[0].Url : string.Empty;
+            var assets = document.Get<IEnumerable<Asset>>(codename);
+            return assets?.FirstOrDefault()?.Url ?? string.Empty;
         }
 
         /// <summary>

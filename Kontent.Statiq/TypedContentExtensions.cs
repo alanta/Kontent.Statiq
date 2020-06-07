@@ -23,9 +23,14 @@ namespace Kontent.Statiq
         /// <exception cref="InvalidOperationException">Thrown when this method is called on a document that doesn't a Kontent content item.</exception>
         public static TModel AsKontent<TModel>(this IDocument document)
         {
+            return GetContentItem(document).CastTo<TModel>();
+        }
+
+        internal static ContentItem GetContentItem(this IDocument document)
+        {
             if (document.TryGetValue(KontentItemKey, out ContentItem contentItem))
             {
-                return contentItem.CastTo<TModel>();
+                return contentItem;
             }
 
             throw new InvalidOperationException($"This is not a Kontent document: {document.Source}");

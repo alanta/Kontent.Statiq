@@ -1,7 +1,7 @@
 ﻿using Kentico.Kontent.Delivery;
 using Kentico.Kontent.Delivery.Abstractions;
 using Kentico.Kontent.Delivery.Builders.DeliveryClient;
-using Kontent.Statiq.Metadata;
+using Microsoft.Extensions.Logging;
 using Statiq.Common;
 using System;
 using System.Collections.Generic;
@@ -114,24 +114,43 @@ namespace Kontent.Statiq
             {
                 new KeyValuePair<string, object>(TypedContentExtensions.KontentItemKey, item),
                 new KeyValuePair<string, object>("name", item.System.Name),
-                new KeyValuePair<string, object>("codename", item.System.Codename)
+                new KeyValuePair<string, object>("codename", item.System.Codename),
+                new KeyValuePair<string, object>("language", item.System.Language),
+                new KeyValuePair<string, object>("id", item.System.Id),
+                new KeyValuePair<string, object>("type", item.System.Type)
             };
 
             foreach (var element in item.Elements)
             {
                 string type = element.Value.type;
 
-                KeyValuePair<string, object> metadataItem;
                 switch (type)
                 {
                     case "asset":
-                        if (AssetElementParser.TryParseMetadata(element, out metadataItem)) metadata.Add(metadataItem);
+                        metadata.Add(new KeyValuePair<string, object>(element.Name, item.GetAssets(element.Name)));
+                        break;
+                    case "date_time":
+                        metadata.Add(new KeyValuePair<string, object>(element.Name, item.GetDateTime(element.Name)));
+                        break;
+                    case "number":
+                        metadata.Add(new KeyValuePair<string, object>(element.Name, item.GetNumber(element.Name)));
+                        break;
+                    case "multiple_choice":
+                        metadata.Add(new KeyValuePair<string, object>(element.Name, item.GetOptions(element.Name)));
+                        break;
+                    case "modular_content":
+                        metadata.Add(new KeyValuePair<string, object>(element.Name, item.GetLinkedItems(element.Name)));
+                        break;
+                    case "taxonomy":
+                        metadata.Add(new KeyValuePair<string, object>(element.Name, item.GetTaxonomyTerms(element.Name)));
+                        break;
+                    case "url_slug":
+                    case "text":
+                    case "rich_text":
+                        metadata.Add( new KeyValuePair<string, object>(element.Name, item.GetString(element.Name)));
                         break;
                     default:
-                        if (DefaultElementParser.TryParseMetadata(element, out metadataItem))
-                        {
-                            metadata.Add(metadataItem);
-                        }
+                        context.LogDebug($"Unknown type '{type}' for content element '{element.Name}'" );
                         break;
                 }
             }

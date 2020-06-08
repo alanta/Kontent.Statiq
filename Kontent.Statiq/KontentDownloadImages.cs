@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 namespace Kontent.Statiq
 {
     /// <summary>
-    /// Downloads all assets found in input documents processed with <see cref="KontentImageProcessor"/>
+    /// Downloads all images found in input documents processed with <see cref="KontentImageProcessor"/>
     /// The downloaded assets can then be processed with modules such as <see cref="WriteFiles"/>.
     /// </summary>
-    public class KontentDownloadAssets : ReadWeb
+    public class KontentDownloadImages : ReadWeb
     {
+        /// <inheritdoc />
         protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
         {
             var assets = context.Inputs
-                .SelectMany(doc => doc.GetKontentAssetDownloads())
+                .SelectMany(doc => doc.GetKontentImageDownloads())
                 .ToArray();
 
             var assetUrls = assets.Select(a => a.OriginalUrl).ToArray(); // TODO: distinct by local path

@@ -1,8 +1,5 @@
-﻿using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.Delivery.ImageTransformation;
-using Statiq.Common;
+﻿using Statiq.Common;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -15,48 +12,16 @@ namespace Kontent.Statiq
     /// </summary>
     public static class KontentAssetHelper
     {
-        private static MD5 _md5 = MD5.Create();
+        private static readonly MD5 Md5 = MD5.Create();
 
         /// <summary>
-        /// Get all the assets uris in a Statiq document.
+        /// Get the image downloads for the document. These are added by the <see cref="KontentImageProcessor"/>.
         /// </summary>
         /// <param name="doc">The document.</param>
-        /// <returns>All the urls for assets in the document.</returns>
-        public static string[] GetAssetUris(IDocument doc)
+        /// <returns>An array of <see cref="KontentImageDownload"/> objects listing the image substitutions performed by <see cref="KontentImageProcessor"/>.</returns>
+        public static KontentImageDownload[] GetKontentImageDownloads(this IDocument doc)
         {
-            var assetUrls = new List<string>();
-
-            var assets = doc.Select(x => x.Value).OfType<IEnumerable<Asset>>().ToList();
-            if (assets.Any())
-            {
-                foreach (var asset in assets)
-                {
-
-                    foreach (var image in asset)
-                    {
-                        assetUrls.Add(image.Url);
-                    }
-                }
-            }
-
-            return assetUrls.ToArray();
-        }
-
-        public static string GetAssetFileName(IDocument doc)
-        {
-            var fileUrl = doc.Get<string>("SourceUri");
-            return GetAssetFileName(fileUrl);
-        }
-
-        public static string GetAssetFileName(string fileUrl)
-        {
-            var splitPath = fileUrl.Split('/');
-            return $"{splitPath[splitPath.Length - 2]}/{splitPath[splitPath.Length - 1]}";
-        }
-
-        public static KontentAssetDownload[] GetKontentAssetDownloads(this IDocument doc)
-        {
-            return doc.Get<KontentAssetDownload[]>(KontentImageProcessor.KontentAssetDownloadKey) ?? Array.Empty<KontentAssetDownload>();
+            return doc.Get<KontentImageDownload[]>(KontentImageProcessor.KontentAssetDownloadKey) ?? Array.Empty<KontentImageDownload>();
         }
 
         /// <summary>
@@ -83,14 +48,14 @@ namespace Kontent.Statiq
                         .Select(kv => $"{kv.key}={kv.value}"));
                 
                 // hash the query - no need to disclose what transforms were done on the image
-                var hash = string.Join("", _md5
+                var hash = string.Join("", Md5
                     .ComputeHash(System.Text.Encoding.UTF8.GetBytes(sortedQuery))
                     .Select(b => b.ToString("x2")));
 
                 fileName = $"{hash}-{fileName}";
             }
 
-            return System.IO.Path.Combine(localBasePath.FullPath, fileName).Replace("\\", "/");
+            return Path.Combine(localBasePath.FullPath, fileName).Replace("\\", "/");
         }
 
         private static string ReplaceInvalidChars(string filename)

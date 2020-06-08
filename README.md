@@ -74,23 +74,23 @@ KontentModelGenerator --projectid "your-api-key" --outputdir Models --namespace 
 * Change the pipeline to look like this:
 
 ```c#
-public class Posts : Pipeline
+public class Articles : Pipeline
 {
-    public Posts()
+    public Articles()
     {
         InputModules = new ModuleList{
             new Kontent.Statiq.Kontent("your-api-key")
                 .WithTypeProvider<My.Models.CustomTypeProvider>()
                 .WithContentType(My.Models.Article.Codename)
                 .WithContentField(My.Models.Article.BodyCopyCodename),
-            new KontentAssetParser(),
             new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"post/{doc[My.Models.Article.UrlPatternCodename]}.html"))),
         };
 
         ProcessModules = new ModuleList {
             new MergeContent(new ReadFiles(patterns: "Article.cshtml") ),
             new RenderRazor()
-            .WithModel(Config.FromDocument((document, context) => document.AsKontent<My.Models.Article>())) // use the stront-typed model for Razor
+            // use the stront-typed model for Razor
+              .WithModel(Config.FromDocument((document, context) => document.AsKontent<My.Models.Article>())) 
         };
 
         OutputModules = new ModuleList { 
@@ -113,23 +113,84 @@ As you can see, all the magic strings are gone and the Razor view uses the model
 Kontent allows you to have content within content. Which is very powerfull but requires a bit of work on the client side to make it work.
 You basically have two options:
 
-* _Inline resolvers_
+### Inline resolvers
+
   These are called by the Kontent Delivery Client to transform inline content items into HTML. They're nice for simple models with very basic HTML.
   Inline resolvers enable the Delivery API client to map structured content directly to HTML. This is achieved by making the property on the typed content class a string.
-* _Structured content_
+
+### Structured content
+
   You can also use the structured content in your application. This is achieved by making the content property of type `IRichTextContent`. This allows you to render the inline content in views or what ever code is appropriate.
 
 Both these models can be used with Statiq, it's up to your preferences.
 
-Where ever Statiq hands you a `Document`, use the extension method `.AsKontent<TModel>()` to get the typed model from the document.
+Where ever Statiq hands you an `IDocument`, use the extension method `.AsKontent<TModel>()` to get the typed model from the document.
 
 ## Working with Inline resolvers (optional)
 
 _TODO_
 
-## Working with Assets (optional)
+## Working with images (optional)
 
-_TODO_
+Kontent can also manage your images. It hase a very comprehensive set of [image manipulations](https://docs.kontent.ai/reference/image-transformation) baked into the Delivery API and you can leverage that with Statiq.
+
+For example:
+
+```html
+<img src="@Model.TeaserImage.First().ImageUrl().WithWidth(350).WithHeight(350).WithFitMode(ImageFitMode.Crop).Url"/>
+```
+
+In this example `TeaserImage` is an Asset field on a strong-typed model. We pick the first asset and then the `ImageUrl` extension method provides easy access to the [ImageUrlBuilder](https://github.com/Kentico/kontent-delivery-sdk-net/blob/master/Kentico.Kontent.ImageTransformation/ImageUrlBuilder.cs) from the Kontent .NET SDK.
+
+The `ImageUrlBuilder` provides a fluent API to specify image manipulations including resizing and a focus point. Finally, the `Url` property returns the full URL.
+
+### Remote or local images?
+Now you can leave it at that and get them served up from the Kontent API. For the full static site experience however, you can also download the images and store them in the site.
+
+Kontent Statiq contains the `KontentImageProcessor` module that will pickup all images in your HTML content. It will generate a local unique URL for each image and replace the original url with the local url.
+After that you can use the `KontentDownloadImages` module to download the images. Using the Statiq built-in task you can write them to disk.
+
+> These modules will process _all_ images in your html. Use the `WithFilter` extension to limit what images processed and downloaded into your application.
+
+If you're following along with the sample project:
+
+* Process all images by adding the `KontentImageProcessor` module to the end of the `ProcessModules` phase of the Article pipeline (see demo code above for full listing).
+```csharp
+...
+ProcessModules = new ModuleList {
+        new MergeContent(new ReadFiles(patterns: "Article.cshtml") ),
+        new RenderRazor()
+            .WithModel(Config.FromDocument((document, context) => document.AsKontent<My.Models.Article>())),
+
+        // Get urls from all images and replace with a local path
+        new KontentImageProcessor()
+    };
+...
+```
+
+* Now create a new pipeline:
+```csharp
+public class DownloadImages : Pipeline
+{
+    public DownloadImages()
+    {
+        Dependencies.Add(nameof(Articles)); 
+
+        PostProcessModules = new ModuleList(
+            // Pull documents from other pipelines
+            new ReplaceDocuments(Dependencies.ToArray()),
+            // Download the images 
+            new KontentDownloadImages()
+        );
+        OutputModules = new ModuleList(
+            // Write the collected images to disk
+            new WriteFiles()
+        );
+    }
+}
+```
+
+The `KontentImageProcessor` will add any replaced image url to a collection in the Document metadata for processing by the `KontentDownloadImages` module at a later stage.
 
 ## Troubleshooting
 

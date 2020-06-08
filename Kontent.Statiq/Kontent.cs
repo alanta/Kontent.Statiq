@@ -18,22 +18,22 @@ namespace Kontent.Statiq
         /// <summary>
         /// The preview API key to use. Set this if you want to use preview (unpublished) content./>.
         /// </summary>
-        public string PreviewApiKey { get; set; }
+        public string? PreviewApiKey { get; set; }
         
         /// <summary>
-        /// The production API key to use. Set either this key if you don't want preview content and have secured your API (paid subscribtion required)./>.
+        /// The production API key to use. Set either this key if you don't want preview content and have secured your API (paid subscription required)./>.
         /// </summary>
-        public string ProductionApiKey { get; set; }
+        public string? ProductionApiKey { get; set; }
         
         /// <summary>
-        /// The Kontent project id. This is required.
+        /// The Kontent project id. This is required unless you provide your own Kontent client instance.
         /// </summary>
-        public string ProjectId { get; }
+        public string? ProjectId { get; }
         
         /// <summary>
         /// The code name of the field uses to fill the main Content field on the Statiq document. This is mostly useful for untyped content.
         /// </summary>
-        public string ContentField { get; set; }
+        public string? ContentField { get; set; }
 
         private readonly Lazy<IDeliveryClient> _client;
         
@@ -58,7 +58,7 @@ namespace Kontent.Statiq
         /// </summary>
         /// <param name="projectId">Kontent project ID</param>
         /// <param name="previewApiKey">The preview API key (optional)</param>
-        public Kontent(string projectId, string previewApiKey = null)
+        public Kontent(string projectId, string? previewApiKey = null)
         {
             if (string.IsNullOrWhiteSpace(projectId))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(projectId));
@@ -122,6 +122,9 @@ namespace Kontent.Statiq
 
             foreach (var element in item.Elements)
             {
+                if( element == null )
+                    continue;
+
                 string type = element.Value.type;
 
                 switch (type)

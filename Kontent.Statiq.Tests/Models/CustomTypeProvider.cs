@@ -26,10 +26,10 @@ namespace Kontent.Statiq.Tests.Models
 
         public Type GetType(string contentType)
         {
-            return _codenames.Keys.FirstOrDefault(type => GetCodename(type).Equals(contentType));
+            return _codenames.Keys.FirstOrDefault(type => string.Equals(GetCodename(type), contentType));
         }
 
-        public string GetCodename(Type contentType)
+        public string? GetCodename(Type contentType)
         {
             return _codenames.TryGetValue(contentType, out var codename) ? codename : null;
         }

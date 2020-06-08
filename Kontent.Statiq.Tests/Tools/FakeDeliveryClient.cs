@@ -20,7 +20,7 @@ namespace Kontent.Statiq.Tests.Tools
         // More info https://github.com/Kentico/kontent-delivery-sdk-net/wiki/Faking-responses
 
 
-        public static IDeliveryClient Create(string response, Func<IOptionalClientSetup, IOptionalClientSetup> configureClient = null)
+        public static IDeliveryClient Create(string response, Func<IOptionalClientSetup, IOptionalClientSetup>? configureClient = null)
         {
             const string testUrl = "https://tests.fake.url";
 
@@ -45,22 +45,19 @@ namespace Kontent.Statiq.Tests.Tools
                 .WithCustomEndpoint($"{baseUrl}/{{0}}")
                 .Build();
 
-        private static IDeliveryClient CreateMockDeliveryClient(DeliveryOptions deliveryOptions, HttpClient httpClient, Func<IOptionalClientSetup, IOptionalClientSetup> configureClient)
+        private static IDeliveryClient CreateMockDeliveryClient(DeliveryOptions deliveryOptions, HttpClient httpClient, Func<IOptionalClientSetup, IOptionalClientSetup>? configureClient)
         {
-            //var contentLinkUrlResolver = A.Fake<IContentLinkUrlResolver>();
-            //var modelProvider = A.Fake<IModelProvider>();
             var retryPolicy = A.Fake<IRetryPolicy>();
             var retryPolicyProvider = A.Fake<IRetryPolicyProvider>();
             A.CallTo(() => retryPolicyProvider.GetRetryPolicy())
                 .Returns(retryPolicy);
             A.CallTo(() => retryPolicy.ExecuteAsync(A<Func<Task<HttpResponseMessage>>>._))
-                .ReturnsLazily(c => c.GetArgument<Func<Task<HttpResponseMessage>>>(0)());
+                .ReturnsLazily(c => c.GetArgument<Func<Task<HttpResponseMessage>>>(0)!.Invoke() );
 
             var client = DeliveryClientBuilder
                 .WithOptions(_ => deliveryOptions)
                 .WithDeliveryHttpClient(new DeliveryHttpClient(httpClient))
                 //.WithContentLinkUrlResolver(contentLinkUrlResolver)
-                //.WithModelProvider(modelProvider)
                 .ApplyIfNotNull( configureClient )
                 .WithRetryPolicyProvider(retryPolicyProvider)
                 .Build();
@@ -69,9 +66,9 @@ namespace Kontent.Statiq.Tests.Tools
         }
     }
 
-    public static class Helpers
+    internal static class Helpers
     {
-        public static TBuilder ApplyIfNotNull<TBuilder>(this TBuilder builder, Func<TBuilder, TBuilder> configure)
+        public static TBuilder ApplyIfNotNull<TBuilder>(this TBuilder builder, Func<TBuilder, TBuilder>? configure)
         {
             return configure != null ? configure(builder) : builder;
         }

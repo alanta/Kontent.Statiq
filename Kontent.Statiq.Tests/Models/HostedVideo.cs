@@ -4,19 +4,20 @@
 // Changes to this file may cause incorrect behavior and will be lost if the code is regenerated. 
 // For further modifications of the class, create a separate file with the partial class.
 
-using Kentico.Kontent.Delivery.Abstractions;
+using System;
 using System.Collections.Generic;
+using Kentico.Kontent.Delivery.Abstractions;
 
 namespace Kontent.Statiq.Tests.Models
 {
     public partial class HostedVideo
     {
         public const string Codename = "hosted_video";
-        public const string VideoIdCodename = "video_id";
         public const string VideoHostCodename = "video_host";
+        public const string VideoIdCodename = "video_id";
 
+        public IContentItemSystemAttributes System { get; set; }
+        public IEnumerable<IMultipleChoiceOption> VideoHost { get; set; }
         public string VideoId { get; set; }
-        public IEnumerable<MultipleChoiceOption> VideoHost { get; set; }
-        public ContentItemSystemAttributes System { get; set; }
     }
 }

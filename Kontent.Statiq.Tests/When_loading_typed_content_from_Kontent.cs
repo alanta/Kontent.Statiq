@@ -23,9 +23,8 @@ namespace Kontent.Statiq.Tests
             var responseJsonPath = Path.Combine(Environment.CurrentDirectory, $"response{Path.DirectorySeparatorChar}getitems.json");
             var responseJson = File.ReadAllText(responseJsonPath);
 
-            var sut = new Statiq.Kontent(MockDeliveryClient.Create(responseJson, cfg => cfg
-                    .WithTypeProvider(new CustomTypeProvider())))
-                    .WithContentField(Article.BodyCopyCodename);
+            var sut = new Statiq.Kontent<Article>(MockDeliveryClient.Create(responseJson, cfg => cfg
+                .WithTypeProvider(new CustomTypeProvider())));
 
             var context = Setup_ExecutionContext();
 
@@ -49,9 +48,8 @@ namespace Kontent.Statiq.Tests
             var responseJsonPath = Path.Combine(Environment.CurrentDirectory, $"response{Path.DirectorySeparatorChar}getitems.json");
             var responseJson = File.ReadAllText(responseJsonPath);
 
-            var sut = new Statiq.Kontent(MockDeliveryClient.Create(responseJson, cfg => cfg
-                    .WithTypeProvider(new CustomTypeProvider())))
-                    .WithContentField(Article.BodyCopyCodename);
+            var sut = new Statiq.Kontent<Article>(MockDeliveryClient.Create(responseJson, cfg => cfg
+                .WithTypeProvider(new CustomTypeProvider())));
 
             var context = Setup_ExecutionContext();
 

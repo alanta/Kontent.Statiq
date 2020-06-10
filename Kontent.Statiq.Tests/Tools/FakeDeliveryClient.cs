@@ -1,8 +1,8 @@
 ﻿using FakeItEasy;
 using Kentico.Kontent.Delivery;
 using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.Delivery.Abstractions.RetryPolicy;
 using Kentico.Kontent.Delivery.Builders.DeliveryClient;
+using Kentico.Kontent.Delivery.Configuration;
 using RichardSzalay.MockHttp;
 using System;
 using System.Net.Http;

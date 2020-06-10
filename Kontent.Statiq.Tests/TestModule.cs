@@ -7,17 +7,17 @@ namespace Kontent.Statiq.Tests
 {
     internal class TestModule : Module
     {
-        private readonly Action<IReadOnlyList<IDocument>> _test;
+        private readonly Func<IReadOnlyList<IDocument>,Task> _test;
 
-        public TestModule(Action<IReadOnlyList<IDocument>> test)
+        public TestModule(Func<IReadOnlyList<IDocument>,Task> test)
         {
             _test = test;
         }
 
-        protected override Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
+        protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
         {
-            _test(context.Inputs);
-            return Task.FromResult((IEnumerable<IDocument>)context.Inputs);
+            await _test(context.Inputs);
+            return context.Inputs;
         }
     }
 }

@@ -111,7 +111,8 @@ namespace Kontent.Statiq
         /// <summary>
         /// Add an inline item resolver for the specified content type.
         /// </summary>
-        /// <typeparam name="TContentType">The content type for which this resolver is used.</typeparam>
+        /// <typeparam name="TContentModel">The content model.</typeparam>
+        /// <typeparam name="TInlineContentType">The type of the inline content item.</typeparam>
         /// <param name="module">The module.</param>
         /// <param name="resolver">The content resolver instance.</param>
         /// <returns>The module.</returns>
@@ -127,6 +128,7 @@ namespace Kontent.Statiq
         /// </summary>
         /// <typeparam name="TContentType">The content type for which this resolver is used.</typeparam>
         /// <typeparam name="TResolver">The type of the content resolver to use. Must have a default constructor.</typeparam>
+        /// <typeparam name="TContentModel">The content model.</typeparam>
         /// <param name="module">The module.</param>
         /// <returns>The module.</returns>
         public static Kontent<TContentModel> WithInlineItemResolver<TContentModel, TContentType, TResolver>(this Kontent<TContentModel> module)

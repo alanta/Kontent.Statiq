@@ -15,7 +15,11 @@ namespace Kontent.Statiq.Tests
             // Arrange
 
             // Act
-            var sut = PipelineExecutionHelpers.SetupExecution(async docs => docs.Should().NotBeNull());
+            var sut = PipelineExecutionHelpers.SetupExecution(docs =>
+            {
+                docs.Should().NotBeNull();
+                return Task.CompletedTask;
+            });
             await sut.ExecuteAsync();
 
             // Assert

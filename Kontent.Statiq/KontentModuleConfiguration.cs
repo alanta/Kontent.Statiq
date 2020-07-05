@@ -16,7 +16,7 @@ namespace Kontent.Statiq
         /// <param name="field">A func that returns a string to be used as content.</param>
         /// <typeparam name="TContentModel">The content model type.</typeparam>
         /// <returns>The module.</returns>
-        public static Kontent<TContentModel> WithContent<TContentModel>(this Kontent<TContentModel> module, Func<TContentModel,string> field) where TContentModel : class
+        public static Kontent<TContentModel> WithContent<TContentModel>(this Kontent<TContentModel> module, Func<TContentModel, string> field) where TContentModel : class
         {
             module.GetContent = field;
             return module;
@@ -37,7 +37,7 @@ namespace Kontent.Statiq
                 field = "elements." + field;
             }
 
-            module.QueryParameters.Add(new OrderParameter(field, (Kentico.Kontent.Delivery.Urls.QueryParameters.SortOrder) sortOrder));
+            module.QueryParameters.Add(new OrderParameter(field, (Kentico.Kontent.Delivery.Urls.QueryParameters.SortOrder)sortOrder));
             return module;
         }
 
@@ -89,7 +89,7 @@ namespace Kontent.Statiq
         /// <returns>The module.</returns>
         public static Kontent<TContentModel> WithTypeProvider<TContentModel>(this Kontent<TContentModel> module, ITypeProvider typeProvider) where TContentModel : class
         {
-            module.ConfigureClientActions.Add( builder => builder.WithTypeProvider( typeProvider ) );
+            module.ConfigureClientActions.Add(builder => builder.WithTypeProvider(typeProvider));
             return module;
         }
 
@@ -101,7 +101,7 @@ namespace Kontent.Statiq
         /// <typeparam name="TContentModel">The content model type.</typeparam>
         /// <returns>The module.</returns>
         public static Kontent<TContentModel> WithTypeProvider<TTypeProvider, TContentModel>(this Kontent<TContentModel> module)
-            where TTypeProvider : ITypeProvider, new()  
+            where TTypeProvider : ITypeProvider, new()
             where TContentModel : class
         {
             module.ConfigureClientActions.Add(builder => builder.WithTypeProvider(new TTypeProvider()));
@@ -115,10 +115,10 @@ namespace Kontent.Statiq
         /// <param name="module">The module.</param>
         /// <param name="resolver">The content resolver instance.</param>
         /// <returns>The module.</returns>
-        public static Kontent<TContentModel> WithInlineItemResolver<TContentModel,TInlineContentType>(this Kontent<TContentModel> module, IInlineContentItemsResolver<TInlineContentType> resolver )
+        public static Kontent<TContentModel> WithInlineItemResolver<TContentModel, TInlineContentType>(this Kontent<TContentModel> module, IInlineContentItemsResolver<TInlineContentType> resolver)
             where TContentModel : class
         {
-            module.ConfigureClientActions.Add(builder => builder.WithInlineContentItemsResolver( resolver ));
+            module.ConfigureClientActions.Add(builder => builder.WithInlineContentItemsResolver(resolver));
             return module;
         }
 
@@ -129,7 +129,7 @@ namespace Kontent.Statiq
         /// <typeparam name="TResolver">The type of the content resolver to use. Must have a default constructor.</typeparam>
         /// <param name="module">The module.</param>
         /// <returns>The module.</returns>
-        public static Kontent<TContentModel> WithInlineItemResolver<TContentModel,TContentType,TResolver>(this Kontent<TContentModel> module)
+        public static Kontent<TContentModel> WithInlineItemResolver<TContentModel, TContentType, TResolver>(this Kontent<TContentModel> module)
             where TContentModel : class
             where TResolver : IInlineContentItemsResolver<TContentType>, new()
         {

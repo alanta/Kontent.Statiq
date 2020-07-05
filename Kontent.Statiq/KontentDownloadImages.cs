@@ -24,7 +24,7 @@ namespace Kontent.Statiq
 
             WithUris(assetUrls.ToArray());
 
-            var downloads =  await base.ExecuteContextAsync(context);
+            var downloads = await base.ExecuteContextAsync(context);
             var downloadsWithDestination = new List<IDocument>();
 
             foreach (var download in downloads)

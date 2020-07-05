@@ -7,9 +7,9 @@ namespace Kontent.Statiq.Tests
 {
     internal class TestModule : Module
     {
-        private readonly Func<IReadOnlyList<IDocument>,Task> _test;
+        private readonly Func<IReadOnlyList<IDocument>, Task> _test;
 
-        public TestModule(Func<IReadOnlyList<IDocument>,Task> test)
+        public TestModule(Func<IReadOnlyList<IDocument>, Task> test)
         {
             _test = test;
         }

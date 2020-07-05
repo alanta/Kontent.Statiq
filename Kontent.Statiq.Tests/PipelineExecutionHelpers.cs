@@ -11,12 +11,12 @@ namespace Kontent.Statiq.Tests
 {
     internal static class PipelineExecutionHelpers
     {
-        public static Engine SetupExecution(Func<IReadOnlyList<IDocument>,Task> test)
+        public static Engine SetupExecution(Func<IReadOnlyList<IDocument>, Task> test)
         {
             var engine = new Engine();
             var pipeline = new Pipeline()
             {
-                InputModules = {SetupKontentModule(), new TestModule(test)}
+                InputModules = { SetupKontentModule(), new TestModule(test) }
             };
 
             engine.Pipelines.Add("test", pipeline);

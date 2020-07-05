@@ -1,5 +1,4 @@
-﻿using Kentico.Kontent.Delivery.Abstractions;
-using Statiq.Common;
+﻿using Statiq.Common;
 using System;
 
 namespace Kontent.Statiq

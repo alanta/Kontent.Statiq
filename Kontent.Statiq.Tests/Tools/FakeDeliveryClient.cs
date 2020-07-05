@@ -28,7 +28,7 @@ namespace Kontent.Statiq.Tests.Tools
             var deliveryOptions = MockDeliveryOptions(testUrl);
             return CreateMockDeliveryClient(deliveryOptions, httpClient, configureClient);
         }
-        
+
         private static HttpClient MockHttpClient(string baseUrl, string response)
         {
             var mockHttp = new MockHttpMessageHandler();
@@ -52,13 +52,13 @@ namespace Kontent.Statiq.Tests.Tools
             A.CallTo(() => retryPolicyProvider.GetRetryPolicy())
                 .Returns(retryPolicy);
             A.CallTo(() => retryPolicy.ExecuteAsync(A<Func<Task<HttpResponseMessage>>>._))
-                .ReturnsLazily(c => c.GetArgument<Func<Task<HttpResponseMessage>>>(0)!.Invoke() );
+                .ReturnsLazily(c => c.GetArgument<Func<Task<HttpResponseMessage>>>(0)!.Invoke());
 
             var client = DeliveryClientBuilder
                 .WithOptions(_ => deliveryOptions)
                 .WithDeliveryHttpClient(new DeliveryHttpClient(httpClient))
                 //.WithContentLinkUrlResolver(contentLinkUrlResolver)
-                .ApplyIfNotNull( configureClient )
+                .ApplyIfNotNull(configureClient)
                 .WithRetryPolicyProvider(retryPolicyProvider)
                 .Build();
 

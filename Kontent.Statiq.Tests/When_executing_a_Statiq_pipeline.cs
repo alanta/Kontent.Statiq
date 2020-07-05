@@ -15,7 +15,7 @@ namespace Kontent.Statiq.Tests
             // Arrange
 
             // Act
-            var sut = PipelineExecutionHelpers.SetupExecution( async docs => docs.Should().NotBeNull() );
+            var sut = PipelineExecutionHelpers.SetupExecution(async docs => docs.Should().NotBeNull());
             await sut.ExecuteAsync();
 
             // Assert
@@ -39,7 +39,7 @@ namespace Kontent.Statiq.Tests
             // Act
             var sut = PipelineExecutionHelpers.SetupExecution(
                 // Assert    
-                async docs => (await docs.FirstOrDefault().GetContentStringAsync()).Should().Contain("Coffee") 
+                async docs => (await docs.FirstOrDefault().GetContentStringAsync()).Should().Contain("Coffee")
                 );
             await sut.ExecuteAsync();
         }

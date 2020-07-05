@@ -69,8 +69,8 @@ namespace Kontent.Statiq.Tests
         {
             var context = A.Fake<IExecutionContext>();
             A.CallTo(() => context.CreateDocument(A<NormalizedPath>.Ignored, A<NormalizedPath>.Ignored, A<IEnumerable<KeyValuePair<string, object>>>.Ignored, A<IContentProvider>.Ignored))
-                .ReturnsLazily((NormalizedPath path, NormalizedPath destination, IEnumerable <KeyValuePair<string, object>> metadata, IContentProvider content ) =>
-                    new TestDocument(metadata, content)); 
+                .ReturnsLazily((NormalizedPath path, NormalizedPath destination, IEnumerable<KeyValuePair<string, object>> metadata, IContentProvider content) =>
+                    new TestDocument(metadata, content));
             return context;
         }
     }

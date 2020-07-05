@@ -16,12 +16,18 @@ Module to retrieve content from [Kentico Kontent](https://kontent.ai) for buildi
 
 * For the pipeline, add the following code to your project:
 ```c#
+public class Article
+{
+    public string Title { get; set; }
+    publuc string Body_Copy { get; set; }
+}
+
 public class Articles : Pipeline
 {
     public Articles()
     {
         InputModules = new ModuleList{
-            new Kontent.Statiq.Kontent("your-api-key") // put your API key here
+            new Kontent.Statiq.Kontent<Article>("your-api-key") // put your API key here
                 .WithContentType("article") // the code name for the content type
                 .WithContentField("body_copy"), // the code name of the property containing the main content
             new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"{doc["url_pattern"]}.html"))),
@@ -79,7 +85,7 @@ public class Articles : Pipeline
     public Articles()
     {
         InputModules = new ModuleList{
-            new Kontent.Statiq.Kontent("your-api-key")
+            new Kontent.Statiq.Kontent<Article>("your-api-key")
                 .WithTypeProvider<My.Models.CustomTypeProvider>()
                 .WithContentType(My.Models.Article.Codename)
                 .WithContentField(My.Models.Article.BodyCopyCodename),

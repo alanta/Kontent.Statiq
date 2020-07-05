@@ -15,10 +15,10 @@ namespace Kontent.Statiq.Tests
             string content = $"<img src='{url}'/>";
 
             var document = new TestDocument(content);
-            
+
             // When
             var assetParser = new KontentImageProcessor();
-            var output = await ExecuteAsync(new[]{document}, assetParser);
+            var output = await ExecuteAsync(new[] { document }, assetParser);
 
             // Then
             output.Length.Should().Be(1);
@@ -26,7 +26,7 @@ namespace Kontent.Statiq.Tests
 
             var urls = outputDoc.GetKontentImageDownloads();
 
-            urls.Should().Contain( dl => dl.OriginalUrl == url );
+            urls.Should().Contain(dl => dl.OriginalUrl == url);
         }
 
         [Theory,

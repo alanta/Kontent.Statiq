@@ -1,5 +1,4 @@
-﻿using FakeItEasy;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Statiq.Common;
 using Statiq.Core;
 using Statiq.Razor;

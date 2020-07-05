@@ -12,13 +12,13 @@ namespace Kontent.Statiq.Tests.Models
     public partial class Tweet
     {
         public const string Codename = "tweet";
-        public const string TweetLinkCodename = "tweet_link";
-        public const string ThemeCodename = "theme";
         public const string DisplayOptionsCodename = "display_options";
+        public const string ThemeCodename = "theme";
+        public const string TweetLinkCodename = "tweet_link";
 
+        public IEnumerable<IMultipleChoiceOption> DisplayOptions { get; set; }
+        public IContentItemSystemAttributes System { get; set; }
+        public IEnumerable<IMultipleChoiceOption> Theme { get; set; }
         public string TweetLink { get; set; }
-        public IEnumerable<MultipleChoiceOption> Theme { get; set; }
-        public IEnumerable<MultipleChoiceOption> DisplayOptions { get; set; }
-        public ContentItemSystemAttributes System { get; set; }
     }
 }

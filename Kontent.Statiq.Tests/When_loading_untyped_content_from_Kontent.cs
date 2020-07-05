@@ -1,8 +1,8 @@
 using FakeItEasy;
 using FluentAssertions;
+using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
 using Statiq.Common;
-using Statiq.Testing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,8 +21,7 @@ namespace Kontent.Statiq.Tests
             var responseJsonPath = Path.Combine(Environment.CurrentDirectory, $"response{Path.DirectorySeparatorChar}getitems.json");
             var responseJson = File.ReadAllText(responseJsonPath);
 
-            var sut = new Statiq.Kontent(MockDeliveryClient.Create(responseJson))
-                .WithContentField("body_copy");
+            var sut = new Statiq.Kontent<Article>(MockDeliveryClient.Create(responseJson));
 
             var context = A.Fake<IExecutionContext>();
 
@@ -41,8 +40,7 @@ namespace Kontent.Statiq.Tests
             var responseJsonPath = Path.Combine(Environment.CurrentDirectory, $"response{Path.DirectorySeparatorChar}getitems.json");
             var responseJson = File.ReadAllText(responseJsonPath);
 
-            var sut = new Statiq.Kontent(MockDeliveryClient.Create(responseJson))
-                .WithContentField("body_copy");
+            var sut = new Statiq.Kontent<Article>(MockDeliveryClient.Create(responseJson));
 
             var context = A.Fake<IExecutionContext>();
             // Act

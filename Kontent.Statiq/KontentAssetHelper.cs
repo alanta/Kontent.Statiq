@@ -39,14 +39,14 @@ namespace Kontent.Statiq
             if (!string.IsNullOrEmpty(uri.Query))
             {
                 var query = HttpUtility.ParseQueryString(uri.Query);
-                
+
                 // sort the query to ensure the same image gets the same URL
                 var sortedQuery =
                     string.Join("&", query.AllKeys
                         .Select(key => (key, value: query[key]))
                         .OrderBy(kv => kv.key)
                         .Select(kv => $"{kv.key}={kv.value}"));
-                
+
                 // hash the query - no need to disclose what transforms were done on the image
                 var hash = string.Join("", Md5
                     .ComputeHash(System.Text.Encoding.UTF8.GetBytes(sortedQuery))

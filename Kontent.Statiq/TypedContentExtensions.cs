@@ -1,5 +1,4 @@
-﻿using Kentico.Kontent.Delivery.Abstractions;
-using Statiq.Common;
+﻿using Statiq.Common;
 using System;
 
 namespace Kontent.Statiq
@@ -23,12 +22,7 @@ namespace Kontent.Statiq
         /// <exception cref="InvalidOperationException">Thrown when this method is called on a document that doesn't a Kontent content item.</exception>
         public static TModel AsKontent<TModel>(this IDocument document)
         {
-            return GetContentItem(document).CastTo<TModel>();
-        }
-
-        internal static ContentItem GetContentItem(this IDocument document)
-        {
-            if (document.TryGetValue(KontentItemKey, out ContentItem contentItem))
+            if (document.TryGetValue(KontentItemKey, out TModel contentItem))
             {
                 return contentItem;
             }

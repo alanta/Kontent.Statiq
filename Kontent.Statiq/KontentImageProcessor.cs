@@ -42,7 +42,7 @@ namespace Kontent.Statiq
             _urlFilter = filter;
             return this;
         }
-        
+
         /// <inheritdoc/>
         protected override async Task<IEnumerable<IDocument>> ExecuteInputAsync(IDocument input, IExecutionContext context)
         {
@@ -73,14 +73,14 @@ namespace Kontent.Statiq
                 context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
 
                 // update the content
-                image.Source = localPath.IsRelative ? "/"+localPath : localPath.ToString();
+                image.Source = localPath.IsRelative ? "/" + localPath : localPath.ToString();
 
                 // add the url for downloading
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
             }
 
-            return input.Clone( 
-                new []{ new KeyValuePair<string, object>(KontentAssetDownloadKey, downloadUrls.ToArray()) },
+            return input.Clone(
+                new[] { new KeyValuePair<string, object>(KontentAssetDownloadKey, downloadUrls.ToArray()) },
                 await context.GetContentProviderAsync(
                     html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
                     MediaTypes.Html)).Yield();
@@ -104,14 +104,14 @@ namespace Kontent.Statiq
 
                 if (SkipImage(url))
                 {
-                    newSourceSet.Add( match.Value );
+                    newSourceSet.Add(match.Value);
                 }
                 else
                 {
                     var localPath = KontentAssetHelper.GetLocalFileName(url, _localBasePath);
                     context.LogDebug("Replacing srcset image {0} => {1}", url, localPath);
                     newSourceSet.Add($"{localPath} {size}".Trim());
-                    downloads.Add(new KontentImageDownload( url, localPath));
+                    downloads.Add(new KontentImageDownload(url, localPath));
                 }
             }
 

@@ -5,17 +5,18 @@ using Statiq.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Kontent.Statiq.Tests
 {
     internal static class PipelineExecutionHelpers
     {
-        public static Engine SetupExecution(Action<IReadOnlyList<IDocument>> test)
+        public static Engine SetupExecution(Func<IReadOnlyList<IDocument>, Task> test)
         {
             var engine = new Engine();
             var pipeline = new Pipeline()
             {
-                InputModules = {SetupKontentModule(), new TestModule(test)}
+                InputModules = { SetupKontentModule(), new TestModule(test) }
             };
 
             engine.Pipelines.Add("test", pipeline);
@@ -23,12 +24,12 @@ namespace Kontent.Statiq.Tests
         }
 
 
-        internal static Statiq.Kontent SetupKontentModule()
+        internal static Statiq.Kontent<Article> SetupKontentModule()
         {
             var responseJsonPath = Path.Combine(Environment.CurrentDirectory, $"response{Path.DirectorySeparatorChar}getitems.json");
             var responseJson = File.ReadAllText(responseJsonPath);
-            return new Kontent(MockDeliveryClient.Create(responseJson, cfg => cfg.WithTypeProvider(new CustomTypeProvider())))
-                .WithContentField(Article.BodyCopyCodename);
+            return new Kontent<Article>(MockDeliveryClient.Create(responseJson, cfg => cfg.WithTypeProvider(new CustomTypeProvider())))
+                .WithContent(item => item.Title); // TODO : see if we can map rich content into a flat string
         }
     }
 }

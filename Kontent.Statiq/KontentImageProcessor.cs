@@ -1,4 +1,6 @@
-﻿using AngleSharp.Extensions;
+﻿using AngleSharp.Dom;
+using AngleSharp.Extensions;
+using AngleSharp.Html;
 using Microsoft.Extensions.Logging;
 using Statiq.Common;
 using Statiq.Html;
@@ -79,13 +81,34 @@ namespace Kontent.Statiq
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
             }
 
+            foreach (var meta in html.Head.Children.Where(IsImageMetaTag))
+            {
+                var imageSource = meta.GetAttribute(AttributeNames.Content);
+
+                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, _localBasePath);
+
+                context.LogDebug("Replacing metadata image {0} => {1}", imageSource, localPath);
+
+                meta.SetAttribute(AttributeNames.Content, localPath.IsRelative ? "/" + localPath : localPath.ToString());
+
+                // add the url for downloading
+                downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
+            }
+
             return input.Clone(
                 new[] { new KeyValuePair<string, object>(KontentAssetDownloadKey, downloadUrls.ToArray()) },
                 await context.GetContentProviderAsync(
                     html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
                     MediaTypes.Html)).Yield();
-
         }
+
+        private static bool IsImageMetaTag(IElement element)
+        {
+            return string.Equals(element.TagName, TagNames.Meta, StringComparison.OrdinalIgnoreCase) 
+                   && ( (element.GetAttribute("Property")?.Contains("image", StringComparison.OrdinalIgnoreCase) ?? false) || (element.GetAttribute(AttributeNames.Name)?.Contains("image", StringComparison.OrdinalIgnoreCase) ?? false))
+                   && ( element.GetAttribute(AttributeNames.Content)?.StartsWith("http", StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
 
         private bool SkipImage(string uri)
         {

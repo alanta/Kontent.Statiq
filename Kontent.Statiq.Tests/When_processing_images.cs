@@ -50,5 +50,26 @@ namespace Kontent.Statiq.Tests
 
             outputDoc.Content.Should().Contain($"src=\"{localUrl}\"");
         }
+
+        [Theory,
+         InlineData("<meta property=\"og:image\" content=\"https://the.cms/images/image1.jpg\"/>", "/assets/img/image1.jpg")
+         ]
+        public async Task It_should_replace_meta_url_with_local_path(string tag, string localUrl)
+        {
+            // Given 
+            string content = $"<html><head>{tag}</head><body></body>";
+
+            var document = new TestDocument(content);
+
+            // When
+            var assetParser = new KontentImageProcessor().WithLocalPath("/assets/img");
+            var output = await ExecuteAsync(new[] { document }, assetParser);
+
+            // Then
+            output.Length.Should().Be(1);
+            var outputDoc = output[0];
+
+            outputDoc.Content.Should().Contain($"content=\"{localUrl}\"");
+        }
     }
 }

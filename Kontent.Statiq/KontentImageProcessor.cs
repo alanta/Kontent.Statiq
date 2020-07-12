@@ -16,6 +16,9 @@ namespace Kontent.Statiq
     /// <summary>
     /// Parses HTML to find images used in the document. The urls are replaced with local urls and the
     /// asset download urls are added to the output document.
+    /// <para>
+    /// Note that social sharing images require full url so please configure the <c>Host</c> and <c>LinksUseHttps</c> settings.
+    /// </para>
     /// </summary>
     public class KontentImageProcessor : Module
     {
@@ -75,7 +78,7 @@ namespace Kontent.Statiq
                 context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
 
                 // update the content
-                image.Source = localPath.IsRelative ? "/" + localPath : localPath.ToString();
+                image.Source = context.GetLink(localPath);
 
                 // add the url for downloading
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
@@ -89,7 +92,7 @@ namespace Kontent.Statiq
 
                 context.LogDebug("Replacing metadata image {0} => {1}", imageSource, localPath);
 
-                meta.SetAttribute(AttributeNames.Content, localPath.IsRelative ? "/" + localPath : localPath.ToString());
+                meta.SetAttribute(AttributeNames.Content, context.GetLink(localPath, true));
 
                 // add the url for downloading
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));

@@ -1,73 +1,29 @@
 # Kontent.Statiq
 
 ![CI](https://github.com/alanta/Kontent.Statiq/workflows/CI/badge.svg?branch=master)
+[![NuGet](https://img.shields.io/nuget/v/Kontent.Statiq.svg)](https://www.nuget.org/packages/Kontent.Statiq)
 
 Module to retrieve content from [Kentico Kontent](https://kontent.ai) for building static websites with [Statiq](https://Statiq.dev).
 
 ## Getting started
 
-* Setup a project on [Kontent](https://app.kontent.ai/sign-up), there's a free Starter-level account. 
+* Setup a project on [Kontent](https://app.kontent.ai/sign-up), there's a free [Developer Plan](https://kontent.ai/pricing#developer-plan). 
   This document assumes you're using the [demo project](https://docs.kontent.ai/tutorials/set-up-kontent/projects/manage-projects#a-creating-a-sample-project).
-* Get the API key for your project, you'll need it later
-* Folow the [gettting started](https://statiq.dev/framework/) steps for Statiq.Framework, then come back here to setup a pipeline
+* Get the [Project ID](https://docs.kontent.ai/tutorials/develop-apps/get-content/get-content-items#a-getting-content-items) of your project, you'll need it later
+* Follow the [getting started](https://statiq.dev/framework/) steps for Statiq.Framework, then come back here to set up a pipeline
 * Add `Kontent.Statiq` to the project:
 
 ```dotnet add package Kontent.Statiq --version 1.0.0-*```
 
-* For the pipeline, add the following code to your project:
-```c#
-public class Article
-{
-    public string Title { get; set; }
-    publuc string Body_Copy { get; set; }
-}
-
-public class Articles : Pipeline
-{
-    public Articles()
-    {
-        InputModules = new ModuleList{
-            new Kontent.Statiq.Kontent<Article>("your-api-key") // put your API key here
-                .WithContentType("article") // the code name for the content type
-                .WithContentField("body_copy"), // the code name of the property containing the main content
-            new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"{doc["url_pattern"]}.html"))),
-        };
-
-        OutputModules = new ModuleList { 
-            new WriteFiles()
-        };
-    }
-}
-```
-* Run the console app: `dotnet run`
-
-You should now see that for every Article in the Kontent site there's an html file in the `output` folder.
-
-To configure the Kontent module for Statiq you need to specify the type of content to fetch by calling `.WithContentType("...")` and what property contains the main content by calling `.WithContentField("...")`. 
-[Statiq Document](https://statiq.dev/framework/documents/) are essentially a set of key-value pairs and Kontent.Statiq will make all the properties on your content item available in the Statiq document.
-You can access them using the code name for the property.
-
-This is a very basic pipeline and gives you everything you need to get started with content served from a Kontent project. 
-But Kontent has more advanced features and some nice extra's that you can leverage to get better integration and more robust code.
-
-## Working with typed content
-
-Working with code names to access content is very flexible but also a bit brittle. Fortunately, Kontent has full support for working with typed content and Kontent.Statiq allows you to use that within Statiq.
-This means you can use regular Razor views with a strong typed model, without looking up content with magic strings.
-
-The generator tool, [Kontent generator](https://github.com/Kentico/kontent-generators-net), generates a C# class for each of the content type in your project as well as a TypeProvider that maps type names to C# classes and vice versa.
-This tool makes it easy to keep your code in sync with your Kontent project. It also provides all the code names for the properties on your content models so you can more easily work with untyped content in C#.
-
-To make this work setup a Statiq project as described above and follow these additional steps:
-
-* First, install the [Kontent generator](https://github.com/Kentico/kontent-generators-net) tool to generate strong-typed models for your project
+* Install the [Kontent generator](https://github.com/Kentico/kontent-generators-net) tool to generate strong-typed models for your project
 * Generate the models for your project into the Models folder:
 
 ```cmd
-KontentModelGenerator --projectid "your-api-key" --outputdir Models --namespace My.Models -s true -g true
+KontentModelGenerator --projectid "<your-project-id>" --outputdir Models --namespace My.Models -s true -g true
 ```
+_The tool generates a C# class for each of the content types in your project as well as a `TypeProvider` that maps type names to C# classes and vice versa. It makes it easy to keep your code in sync with your Kontent project. It also provides all the code names for the properties on your content models so you can more easily work with untyped content in C#._
 
-* Put a Razor view named `Article.cs` into `/input`:
+* Put a Razor view named `Article.cshtml` into `/input`:
 
 ```cshtml
 @model My.Models.Article
@@ -76,30 +32,30 @@ KontentModelGenerator --projectid "your-api-key" --outputdir Models --namespace 
 
 @Model.BodyCopy
 ```
+_As you can see, the Razor view uses the model generated by Kontent. If you open the project in Visual Studio, you'll get code completion and feedback to help you write your view._
 
-* Change the pipeline to look like this:
+* For the pipeline, add the following code to your project:
 
 ```c#
-public class Articles : Pipeline
+public class ArticlesPipeline : Pipeline
 {
-    public Articles()
+    public ArticlesPipeline()
     {
         InputModules = new ModuleList{
-            new Kontent.Statiq.Kontent<Article>("your-api-key")
-                .WithTypeProvider<My.Models.CustomTypeProvider>()
-                .WithContentType(My.Models.Article.Codename)
-                .WithContentField(My.Models.Article.BodyCopyCodename),
-            new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"post/{doc[My.Models.Article.UrlPatternCodename]}.html"))),
+            new Kontent<Article>("<your-project-id>")
+                .WithTypeProvider(new CustomTypeProvider())
+                .WithContent(i=>i.Title).WithContent(i=>i.UrlPattern).WithContent(i=>i.BodyCopy.ToString())
+            , new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"post/{doc.AsKontent<Article>().UrlPattern}.html"))),
         };
 
         ProcessModules = new ModuleList {
             new MergeContent(new ReadFiles(patterns: "Article.cshtml") ),
             new RenderRazor()
-            // use the stront-typed model for Razor
-              .WithModel(Config.FromDocument((document, context) => document.AsKontent<My.Models.Article>())) 
+                // Use the strongly-typed model for Razor
+                .WithModel(Config.FromDocument((document, context) => document.AsKontent<Article>()))
         };
 
-        OutputModules = new ModuleList { 
+        OutputModules = new ModuleList {
             new WriteFiles()
         };
     }
@@ -107,7 +63,10 @@ public class Articles : Pipeline
 ```
 * Run the pipeline `dotnet run`
 
-As you can see, all the magic strings are gone and the Razor view uses the model generated by Kontent. If you open the project in Visual Studio, you'll get code completion and feedback to help you write your view.
+
+You should now see that for every Article in the Kontent site there's an html file in the `\output` folder.
+
+This is a very basic pipeline and gives you everything you need to get started with content served from a Kontent project. But Kontent has more advanced features and some nice extras that you can leverage to get better integration and more robust code.
 
 ## Inline content
 
@@ -116,12 +75,12 @@ You basically have two options:
 
 ### Inline resolvers
 
-  These are called by the Kontent Delivery Client to transform inline content items into HTML. They're nice for simple models with very basic HTML.
-  Inline resolvers enable the Delivery API client to map structured content directly to HTML. This is achieved by making the property on the typed content class a string.
+These are called by the Kontent Delivery Client to transform inline content items into HTML. They're nice for simple models with very basic HTML.
+Inline resolvers enable the Delivery API client to map structured content directly to HTML. This is achieved by making the property on the typed content class a string.
 
 ### Structured content
 
-  You can also use the structured content in your application. This is achieved by making the content property of type `IRichTextContent`. This allows you to render the inline content in views or what ever code is appropriate.
+You can also use the structured content in your application. This is achieved by making the content property of type `IRichTextContent`. This allows you to render the inline content in views or what ever code is appropriate.
 
 Both these models can be used with Statiq, it's up to your preferences.
 

@@ -240,5 +240,12 @@
         }
       }
     }
+  },
+  "pagination": {
+    "skip": 0,
+    "limit": 10,
+    "count": 10,
+    "total_count": 1,
+    "next_page": "https://deliver.kontent.ai/<project_id>/<resource>?limit=10&skip=10"
   }
 }

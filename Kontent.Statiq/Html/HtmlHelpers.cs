@@ -1,4 +1,4 @@
-﻿using Kentico.Kontent.Delivery.ContentItems;
+﻿using Kentico.Kontent.Delivery.Abstractions;
 using Kentico.Kontent.ImageTransformation;
 using Statiq.Common;
 using System.Collections.Generic;
@@ -12,11 +12,11 @@ namespace Kontent.Statiq.Html
     public static class HtmlHelpers
     {
         /// <summary>
-        /// Build an image url from an <see cref="Asset"/>.
+        /// Build an image url from an <see cref="IAsset"/>.
         /// </summary>
         /// <param name="asset"></param>
         /// <returns>An <see cref="ImageUrlBuilder"/> for the asset.</returns>
-        public static ImageUrlBuilder ImageUrl(this Asset asset)
+        public static ImageUrlBuilder ImageUrl(this IAsset asset)
         {
             return new ImageUrlBuilder(asset.Url);
         }
@@ -34,7 +34,7 @@ namespace Kontent.Statiq.Html
                 return string.Empty;
             }
 
-            var assets = document.Get<IEnumerable<Asset>>(codename);
+            var assets = document.Get<IEnumerable<IAsset>>(codename);
             return assets?.FirstOrDefault()?.Url ?? string.Empty;
         }
     }

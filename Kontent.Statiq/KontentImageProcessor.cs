@@ -1,11 +1,12 @@
-﻿using AngleSharp.Dom;
-using AngleSharp.Extensions;
-using AngleSharp.Html;
+﻿using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using Microsoft.Extensions.Logging;
 using Statiq.Common;
-using Statiq.Html;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,6 +17,9 @@ namespace Kontent.Statiq
     /// <summary>
     /// Parses HTML to find images used in the document. The urls are replaced with local urls and the
     /// asset download urls are added to the output document.
+    /// <para>
+    /// Note that social sharing images require full url so please configure the <c>Host</c> and <c>LinksUseHttps</c> settings.
+    /// </para>
     /// </summary>
     public class KontentImageProcessor : Module
     {
@@ -48,7 +52,10 @@ namespace Kontent.Statiq
         /// <inheritdoc/>
         protected override async Task<IEnumerable<IDocument>> ExecuteInputAsync(IDocument input, IExecutionContext context)
         {
-            var html = await input.ParseHtmlAsync(context);
+            var html = await ParseHtmlAsync(input, context);
+
+            if (html == null)
+                return input.Yield();
 
             var downloadUrls = new List<KontentImageDownload>();
 
@@ -75,7 +82,7 @@ namespace Kontent.Statiq
                 context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
 
                 // update the content
-                image.Source = localPath.IsRelative ? "/" + localPath : localPath.ToString();
+                image.Source = context.GetLink(localPath);
 
                 // add the url for downloading
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
@@ -83,13 +90,17 @@ namespace Kontent.Statiq
 
             foreach (var meta in html.Head.Children.Where(IsImageMetaTag))
             {
-                var imageSource = meta.GetAttribute(AttributeNames.Content);
+                var imageSource = meta.GetAttribute(AngleSharp.Dom.AttributeNames.Content);
+                if (SkipImage(imageSource))
+                {
+                    continue;
+                }
 
                 var localPath = KontentAssetHelper.GetLocalFileName(imageSource, _localBasePath);
 
                 context.LogDebug("Replacing metadata image {0} => {1}", imageSource, localPath);
 
-                meta.SetAttribute(AttributeNames.Content, localPath.IsRelative ? "/" + localPath : localPath.ToString());
+                meta.SetAttribute(AngleSharp.Dom.AttributeNames.Content, context.GetLink(localPath, true));
 
                 // add the url for downloading
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
@@ -153,6 +164,21 @@ namespace Kontent.Statiq
         private static bool IsRemoteUrl(string? url)
         {
             return url != null && _remoteUrlRegex.IsMatch(url);
+        }
+    
+        private static async Task<IHtmlDocument?> ParseHtmlAsync(IDocument document, IExecutionContext context)
+        {
+            try
+            {
+                var parser = new HtmlParser();
+                await using Stream stream = document.GetContentStream();
+                return await parser.ParseDocumentAsync(stream);
+            }
+            catch (Exception ex)
+            {
+                context.LogWarning("Exception while parsing HTML for {0}: {1}", document.ToSafeDisplayString(), ex.Message);
+            }
+            return null;
         }
     }
 }

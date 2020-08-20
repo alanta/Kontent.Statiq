@@ -44,8 +44,8 @@ public class ArticlesPipeline : Pipeline
         InputModules = new ModuleList{
             new Kontent<Article>("<your-project-id>")
                 .WithTypeProvider(new CustomTypeProvider())
-                .WithContent(i=>i.Title).WithContent(i=>i.UrlPattern).WithContent(i=>i.BodyCopy.ToString())
-            , new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"post/{doc.AsKontent<Article>().UrlPattern}.html"))),
+                .WithContent(i=>i.BodyCopy.ToString())
+            , new SetDestination(Config.FromDocument((doc, ctx)  => new NormalizedPath( $"article/{doc.AsKontent<Article>().UrlPattern}.html"))),
         };
 
         ProcessModules = new ModuleList {
@@ -64,7 +64,7 @@ public class ArticlesPipeline : Pipeline
 * Run the pipeline `dotnet run`
 
 
-You should now see that for every Article in the Kontent site there's an html file in the `\output` folder.
+You should now see that for every Article in the Kontent site there's an html file in the `\output\article` folder.
 
 This is a very basic pipeline and gives you everything you need to get started with content served from a Kontent project. But Kontent has more advanced features and some nice extras that you can leverage to get better integration and more robust code.
 
@@ -179,3 +179,4 @@ You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio
 ## Blog posts & docs
 
 [Static sites with Kentico Cloud, Statiq and Netlify](https://www.kenticotricks.com/blog/static-sites-with-kentico-cloud) Kristian Bortnik, 31 jan 2018
+

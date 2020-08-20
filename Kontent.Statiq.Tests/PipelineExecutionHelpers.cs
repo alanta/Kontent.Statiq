@@ -29,7 +29,7 @@ namespace Kontent.Statiq.Tests
             var responseJsonPath = Path.Combine(Environment.CurrentDirectory, $"response{Path.DirectorySeparatorChar}getitems.json");
             var responseJson = File.ReadAllText(responseJsonPath);
             return new Kontent<Article>(MockDeliveryClient.Create(responseJson, cfg => cfg.WithTypeProvider(new CustomTypeProvider())))
-                .WithContent(item => item.Title); // TODO : see if we can map rich content into a flat string
+                .WithContent(item => item.Title);
         }
     }
 }

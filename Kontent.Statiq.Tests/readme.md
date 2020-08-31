@@ -23,7 +23,7 @@ The Delivery Client supports [strong typed models](https://github.com/Kentico/ko
 In the test project, the `Models` folder contains the generated content models for the Kentico demo project. To regenerate the models, install the [Kontent generator](https://github.com/Kentico/kontent-generators-net) and use the following command:
 
 ```
-KontentModelGenerator --projectid "00000000-0000-0000-0000-000000000000" --outputdir Models --namespace Kontent.Statiq.Tests.Models -s true -g true
+KontentModelGenerator --projectid "00000000-0000-0000-0000-000000000000" --outputdir Models --namespace Kontent.Statiq.Tests.Models -s true -g false
 ```
 
 You will need to fill in the correct project id for your account. 

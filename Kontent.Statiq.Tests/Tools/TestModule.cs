@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Kontent.Statiq.Tests
+namespace Kontent.Statiq.Tests.Tools
 {
     internal class TestModule : Module
     {

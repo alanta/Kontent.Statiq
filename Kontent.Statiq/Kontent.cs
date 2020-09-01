@@ -1,5 +1,4 @@
 ﻿using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.Delivery.Builders.DeliveryClient;
 using Statiq.Common;
 using System;
 using System.Collections.Generic;
@@ -16,28 +15,12 @@ namespace Kontent.Statiq
     public sealed class Kontent<TContentModel> : Module where TContentModel : class
     {
         /// <summary>
-        /// The preview API key to use. Set this if you want to use preview (unpublished) content./>.
-        /// </summary>
-        public string? PreviewApiKey { get; set; }
-
-        /// <summary>
-        /// The production API key to use. Set either this key if you don't want preview content and have secured your API (paid subscription required)./>.
-        /// </summary>
-        public string? ProductionApiKey { get; set; }
-
-        /// <summary>
-        /// The Kontent project id. This is required unless you provide your own Kontent client instance.
-        /// </summary>
-        public string? ProjectId { get; }
-
-        /// <summary>
         /// The code name of the field uses to fill the main Content field on the Statiq document. This is mostly useful for untyped content.
         /// </summary>
         public Func<TContentModel, string>? GetContent { get; set; }
 
         private readonly Lazy<IDeliveryClient> _client;
 
-        internal List<Action<IOptionalClientSetup>> ConfigureClientActions = new List<Action<IOptionalClientSetup>>();
         internal List<IQueryParameter> QueryParameters { get; } = new List<IQueryParameter>();
 
         /// <summary>
@@ -51,49 +34,6 @@ namespace Kontent.Statiq
                 throw new ArgumentNullException(nameof(client), $"{nameof(client)} must not be null");
 
             _client = new Lazy<IDeliveryClient>(() => client);
-        }
-
-        /// <summary>
-        /// Create a new instance of the Kontent module for Statiq.
-        /// </summary>
-        /// <param name="projectId">Kontent project ID</param>
-        /// <param name="previewApiKey">The preview API key (optional)</param>
-        public Kontent(string projectId, string? previewApiKey = null)
-        {
-            if (string.IsNullOrWhiteSpace(projectId))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(projectId));
-            ProjectId = projectId;
-            PreviewApiKey = previewApiKey;
-            _client = new Lazy<IDeliveryClient>(CreateClient);
-        }
-
-        private IDeliveryClient CreateClient()
-        {
-            var builder = DeliveryClientBuilder
-                .WithOptions(options =>
-                {
-                    var opt2 = options.WithProjectId(ProjectId);
-
-                    if (!string.IsNullOrWhiteSpace(PreviewApiKey))
-                    {
-                        return opt2.UsePreviewApi(PreviewApiKey).Build();
-                    }
-
-                    if (!string.IsNullOrEmpty(ProductionApiKey))
-                    {
-                        return opt2.UseProductionApi(ProductionApiKey).Build();
-                    }
-
-                    return opt2.UseProductionApi().Build();
-
-                });
-
-            foreach (var action in ConfigureClientActions)
-            {
-                action(builder);
-            }
-
-            return builder.Build();
         }
 
         /// <inheritdoc />

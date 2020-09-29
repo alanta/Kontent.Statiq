@@ -23,8 +23,12 @@
   <ItemGroup>
     <PackageReference Include="Kentico.Kontent.Delivery" Version="14.0.0-rc3" />
     <PackageReference Include="Kentico.Kontent.ImageTransformation" Version="14.0.0-rc3" />
-    <PackageReference Include="Statiq.Common" Version="1.0.0-beta.20" />
-    <PackageReference Include="Statiq.Core" Version="1.0.0-beta.20" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.13.1.21947">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Statiq.Common" Version="1.0.0-beta.21" />
+    <PackageReference Include="Statiq.Core" Version="1.0.0-beta.21" />
   </ItemGroup>
 
   <ItemGroup>

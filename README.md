@@ -189,6 +189,10 @@ The `KontentImageProcessor` will add any replaced image url to a collection in t
 
 Make sure you read the section on structured content and follow the configuration steps.
 
+> Links to other pages don't work
+
+Implement an register a link resolver. See the [Kontent docs](https://github.com/Kentico/kontent-delivery-sdk-net/wiki/Resolving-Links-to-Content-Items) for more information.
+
 ## How do I build this repo?
 
 You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio, VS Code or Rider.

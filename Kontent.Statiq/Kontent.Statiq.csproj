@@ -19,16 +19,15 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Kentico.Kontent.Delivery" Version="14.0.0-rc4" />
-    <PackageReference Include="Kentico.Kontent.ImageTransformation" Version="14.0.0-rc4" />
+    <PackageReference Include="Kentico.Kontent.Delivery" Version="14.0.0" />
+    <PackageReference Include="Kentico.Kontent.ImageTransformation" Version="14.0.0" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="8.13.1.21947">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Statiq.Common" Version="1.0.0-beta.22" />
-    <PackageReference Include="Statiq.Core" Version="1.0.0-beta.22" />
+    <PackageReference Include="Statiq.Common" Version="1.0.0-beta.23" />
+    <PackageReference Include="Statiq.Core" Version="1.0.0-beta.23" />
   </ItemGroup>
 
   <ItemGroup>

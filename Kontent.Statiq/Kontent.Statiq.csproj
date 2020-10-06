@@ -19,6 +19,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <AssemblyAttribute Include="Kentico.Kontent.Delivery.DeliverySourceTrackingHeader" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Kentico.Kontent.Delivery" Version="14.0.0" />
     <PackageReference Include="Kentico.Kontent.ImageTransformation" Version="14.0.0" />

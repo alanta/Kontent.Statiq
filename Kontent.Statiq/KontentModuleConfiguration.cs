@@ -37,7 +37,7 @@ namespace Kontent.Statiq
                 field = "elements." + field;
             }
 
-            module.QueryParameters.Add(new OrderParameter(field, (Kentico.Kontent.Delivery.Urls.QueryParameters.SortOrder)sortOrder));
+            module.QueryParameters.Add(new OrderParameter(field, sortOrder));
             return module;
         }
 

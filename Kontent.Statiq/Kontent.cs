@@ -19,7 +19,7 @@ namespace Kontent.Statiq
         /// </summary>
         public Func<TContentModel, string>? GetContent { get; set; }
 
-        private readonly Lazy<IDeliveryClient> _client;
+        private readonly IDeliveryClient _client;
 
         internal List<IQueryParameter> QueryParameters { get; } = new List<IQueryParameter>();
 
@@ -33,19 +33,17 @@ namespace Kontent.Statiq
             if (client == null)
                 throw new ArgumentNullException(nameof(client), $"{nameof(client)} must not be null");
 
-            _client = new Lazy<IDeliveryClient>(() => client);
+            _client = client;
         }
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
         {
-            var items = await _client.Value.GetItemsAsync<TContentModel>(QueryParameters);
+            var items = await _client.GetItemsAsync<TContentModel>(QueryParameters);
 
             var documentTasks = items.Items.Select(item => CreateDocument(context, item)).ToArray();
 
-            await Task.WhenAll(documentTasks);
-
-            return documentTasks.Select(t => t.Result);
+            return await Task.WhenAll(documentTasks);
         }
 
         private async Task<IDocument> CreateDocument(IExecutionContext context, TContentModel item)

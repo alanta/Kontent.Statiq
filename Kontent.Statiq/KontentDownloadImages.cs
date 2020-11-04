@@ -20,7 +20,7 @@ namespace Kontent.Statiq
                 .SelectMany(doc => doc.GetKontentImageDownloads())
                 .ToArray();
 
-            var assetUrls = assets.Select(a => a.OriginalUrl).ToArray(); // TODO: distinct by local path
+            var assetUrls = assets.DistinctBy(a => a.LocalPath).Select(a => a.OriginalUrl).ToArray();
 
             WithUris(assetUrls.ToArray());
 

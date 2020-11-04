@@ -95,6 +95,24 @@ You should now see that for every Article in the Kontent site there's an html fi
 
 This is a very basic pipeline and gives you everything you need to get started with content served from a Kontent project. But Kontent has more advanced features and some nice extras that you can leverage to get better integration and more robust code.
 
+## Filtering content
+
+If you need to filter out the the input document s from Kontent, it is possible to specify the query of your request using `WithQuery(IQueryParameter[])` method.
+
+Let's say, you just want first three latest articles that have the Title element set and you want to load only a subset of.
+
+```csharp
+// ...
+new Kontent<Article>(client)
+    .WithQuery(
+        new NotEmptyFilter("elements.title"),
+        new OrderParameter("elements.post_date", SortOrder.Descending),
+        new LimitParameter(3),
+        new ElementsParameter("title", "summary", "post_date", "url_pattern")
+    )
+// ...
+```
+
 ## Inline content
 
 Kontent allows you to have content within content. Which is very powerfull but requires a bit of work on the client side to make it work.

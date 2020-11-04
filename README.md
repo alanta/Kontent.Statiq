@@ -113,6 +113,8 @@ new Kontent<Article>(client)
 // ...
 ```
 
+> For all filtering possibilities, take a look to the [Kontent .Net SDK docs](https://github.com/Kentico/kontent-delivery-sdk-net/wiki/Querying-content#filtering-retrieved-data).
+
 ## Inline content
 
 Kontent allows you to have content within content. Which is very powerfull but requires a bit of work on the client side to make it work.

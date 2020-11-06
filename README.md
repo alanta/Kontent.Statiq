@@ -68,6 +68,7 @@ public static class Program
             .RunAsync();
 }
 ```
+
 ### Output content straight to file
 
 * Add a pipeline to your project. The pipeline will automatically detected and executed by Statiq.
@@ -112,7 +113,7 @@ You should now see that for every Article in the Kontent site there's an html fi
 
 For more control over your output, you can feed the rich content model provided by Kontent into Razor views. This is very similar to an ASP.NET (Core) web application.
 
-* Add a Razor view named `Article.cshtml` into `/input`:
+* Add a Razor view named `_Article.cshtml` into `/input`:
 
 ```razor
 @model My.Models.Article
@@ -147,7 +148,7 @@ public class ArticlesPipeline : Pipeline
 
         ProcessModules = new ModuleList {
             // Pull in the Razor view, the path is relative to /input
-            new MergeContent(new ReadFiles(patterns: "Article.cshtml") ),
+            new MergeContent(new ReadFiles(patterns: "_Article.cshtml") ),
             // Render the Razor view into the content of the document
             new RenderRazor()
                 // Use the strongly-typed model for the Razor view
@@ -195,10 +196,10 @@ Kontent can also manage your images. It hase a very comprehensive set of [image 
 For example:
 
 ```html
-<img src="@Model.TeaserImage.First().ImageUrl().WithWidth(350).WithHeight(350).WithFitMode(ImageFitMode.Crop).Url"/>
+<img src="@Model.TeaserImage.First().Url?w=350&h=350&fit=crop"/>
 ```
 
-In this example `TeaserImage` is an Asset field on a strong-typed model. We pick the first asset and then the `ImageUrl` extension method provides easy access to the [ImageUrlBuilder](https://github.com/Kentico/kontent-delivery-sdk-net/blob/master/Kentico.Kontent.ImageTransformation/ImageUrlBuilder.cs) from the Kontent .NET SDK.
+In this example `TeaserImage` is an Asset field on a strong-typed model. We pick the first asset. You can set the image transformation parameters by hand or use the `ImageUrl` extension method to get access to the [ImageUrlBuilder](https://github.com/Kentico/kontent-delivery-sdk-net/blob/master/Kentico.Kontent.ImageTransformation/ImageUrlBuilder.cs) from the Kontent .NET SDK.
 
 The `ImageUrlBuilder` provides a fluent API to specify image manipulations including resizing and a focus point. Finally, the `Url` property returns the full URL.
 

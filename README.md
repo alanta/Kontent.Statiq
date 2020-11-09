@@ -283,5 +283,6 @@ You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio
 ## Blog posts, videos & docs
 * [Jamstack and .NET - friends or enemies?](https://www.youtube.com/watch?v=Y_yMveuTOTA) Ondrabus on YouTube, 5 nov 2020
 * [Statiq Starter Kontent Lumen](https://jamstackthemes.dev/theme/statiq-starter-kontent-lumen/) sources on [Github](https://github.com/petrsvihlik/statiq-starter-kontent-lumen), 20 oct 2020
+* [On .NET Live - Generating static web applications with Statiq](https://www.youtube.com/watch?v=43oQTRZqK9g) on Youtube, 6 aug. 2020
 * [Static sites with Kentico Cloud, Statiq and Netlify](https://www.kenticotricks.com/blog/static-sites-with-kentico-cloud) Kristian Bortnik, 31 jan 2018
 

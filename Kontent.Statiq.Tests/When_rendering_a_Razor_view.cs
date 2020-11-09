@@ -44,7 +44,7 @@ namespace Kontent.Statiq.Tests
                     new MergeContent(modules: new ReadFiles(patterns: Path.GetFullPath(".\\input\\Article.cshtml"))),
                     // Render the view
                     new RenderRazor()
-                        .WithModel( Config.FromDocument( (document, context) => document.AsKontent<Models.Article>() ) ),
+                        .WithModel( KontentConfig.As<Article>() ),
                     new TestModule(async documents => (await documents.First().GetContentStringAsync()).Should().Contain("LAYOUT"))
                 }
             };

@@ -3,7 +3,6 @@ using Statiq.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Module = Statiq.Common.Module;
 
@@ -30,10 +29,7 @@ namespace Kontent.Statiq
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="client"/> is null.</exception>
         public Kontent(IDeliveryClient client)
         {
-            if (client == null)
-                throw new ArgumentNullException(nameof(client), $"{nameof(client)} must not be null");
-
-            _client = client;
+            _client = client ?? throw new ArgumentNullException(nameof(client), $"{nameof(client)} must not be null");
         }
 
         /// <inheritdoc />
@@ -41,38 +37,9 @@ namespace Kontent.Statiq
         {
             var items = await _client.GetItemsAsync<TContentModel>(QueryParameters);
 
-            var documentTasks = items.Items.Select(item => CreateDocument(context, item)).ToArray();
+            var documentTasks = items.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
 
             return await Task.WhenAll(documentTasks);
         }
-
-        private async Task<IDocument> CreateDocument(IExecutionContext context, TContentModel item)
-        {
-            var props = typeof(TContentModel).GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy |
-                                                            BindingFlags.GetProperty | BindingFlags.Public);
-            var metadata = new List<KeyValuePair<string, object>>
-            {
-                new KeyValuePair<string, object>(TypedContentExtensions.KontentItemKey, item),
-            };
-
-            if (props.FirstOrDefault(prop => typeof(IContentItemSystemAttributes).IsAssignableFrom(prop.PropertyType))
-                ?.GetValue(item) is IContentItemSystemAttributes systemProp)
-            {
-                metadata.AddRange(new[]
-                {
-                    new KeyValuePair<string, object>(KontentKeys.System.Name, systemProp.Name),
-                    new KeyValuePair<string, object>(KontentKeys.System.CodeName, systemProp.Codename),
-                    new KeyValuePair<string, object>(KontentKeys.System.Language, systemProp.Language),
-                    new KeyValuePair<string, object>(KontentKeys.System.Id, systemProp.Id),
-                    new KeyValuePair<string, object>(KontentKeys.System.Type, systemProp.Type),
-                    new KeyValuePair<string, object>(KontentKeys.System.LastModified, systemProp.LastModified)
-                });
-            }
-
-            var content = GetContent?.Invoke(item) ?? "";
-
-            return await context.CreateDocumentAsync(metadata, content, "text/html");
-        }
-
     }
 }

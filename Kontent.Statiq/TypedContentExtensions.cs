@@ -22,6 +22,11 @@ namespace Kontent.Statiq
         /// <exception cref="InvalidOperationException">Thrown when this method is called on a document that doesn't a Kontent content item.</exception>
         public static TModel AsKontent<TModel>(this IDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document), $"Expected a document of type {typeof(TModel).FullName}");
+            }
+
             if (document.TryGetValue(KontentItemKey, out TModel contentItem))
             {
                 return contentItem;

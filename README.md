@@ -170,6 +170,26 @@ The generated html files are in the `\output\article` folder.
 
 This is a very basic pipeline and gives you everything you need to get started with content served from a Kontent project. But Kontent has more advanced features and some nice extras that you can leverage to get better integration and more robust code.
 
+## Filtering content
+
+If you need to filter out the the input document s from Kontent, it is possible to specify the query of your request using `WithQuery(IQueryParameter[])` method.
+
+Let's say, you just want first three latest articles that have the Title element set and you want to load only a subset of.
+
+```csharp
+// ...
+new Kontent<Article>(client)
+    .WithQuery(
+        new NotEmptyFilter("$"elements.{Article.TitleCodename}""),
+        new OrderParameter("elements.post_date", SortOrder.Descending),
+        new LimitParameter(3),
+        new ElementsParameter("title", "summary", "post_date", "url_pattern")
+    )
+// ...
+```
+
+> For all filtering possibilities, take a look to the [Kontent .Net SDK docs](https://github.com/Kentico/kontent-delivery-sdk-net/wiki/Querying-content#filtering-retrieved-data).
+
 ## Inline content
 
 Kontent allows you to have content within content. Which is very powerfull but requires a bit of work on the client side to make it work.
@@ -280,9 +300,9 @@ You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio
 
 * Marnix van Valen on twitter : @marnixvanvalen or e-mail : marnix [at] alanta [dot] nl
 
+
 ## Blog posts, videos & docs
 * [Jamstack and .NET - friends or enemies?](https://www.youtube.com/watch?v=Y_yMveuTOTA) Ondrabus on YouTube, 5 nov 2020
 * [Statiq Starter Kontent Lumen](https://jamstackthemes.dev/theme/statiq-starter-kontent-lumen/) sources on [Github](https://github.com/petrsvihlik/statiq-starter-kontent-lumen), 20 oct 2020
 * [On .NET Live - Generating static web applications with Statiq](https://www.youtube.com/watch?v=43oQTRZqK9g) on Youtube, 6 aug. 2020
 * [Static sites with Kentico Cloud, Statiq and Netlify](https://www.kenticotricks.com/blog/static-sites-with-kentico-cloud) Kristian Bortnik, 31 jan 2018
-

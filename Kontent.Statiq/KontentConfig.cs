@@ -45,7 +45,7 @@ namespace Kontent.Statiq
         /// <typeparam name="TValue">The return value.</typeparam>
         /// <param name="getValue">A function that retrieves the value from the content.</param>
         /// <returns>A config object.</returns>
-        public static Config<TValue> FromKontent<TContentType, TValue>(Func<TContentType, TValue> getValue)
+        public static Config<TValue> Get<TContentType, TValue>(Func<TContentType, TValue> getValue)
         {
             if (getValue == null) throw new ArgumentNullException(nameof(getValue));
 

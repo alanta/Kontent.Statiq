@@ -142,8 +142,8 @@ public class ArticlesPipeline : Pipeline
             // Load all articles from Kontent
             new Kontent<Article>(client), 
             // Set the output path for each article
-            new SetDestination(Config.FromDocument((doc, ctx)  
-              => new NormalizedPath( $"article/{doc.AsKontent<Article>().UrlPattern}.html"))),
+            new SetDestination(KontentConfig.Get( 
+                (Article item) => new NormalizedPath( $"article/{item.UrlPattern}.html"))),
         };
 
         ProcessModules = new ModuleList {
@@ -152,8 +152,7 @@ public class ArticlesPipeline : Pipeline
             // Render the Razor view into the content of the document
             new RenderRazor()
                 // Use the strongly-typed model for the Razor view
-                .WithModel(Config.FromDocument((document, context) 
-                  => document.AsKontent<Article>()))
+                .WithModel(KontentConfig.As<Article>())
         };
 
         OutputModules = new ModuleList {
@@ -172,7 +171,7 @@ This is a very basic pipeline and gives you everything you need to get started w
 
 ## Filtering content
 
-If you need to filter out the the input document s from Kontent, it is possible to specify the query of your request using `WithQuery(IQueryParameter[])` method.
+If you need to filter out the the input document s from Kontent, it is possible to specify the query of your request using `WithQuery(IQueryParameter[])` builder method.
 
 Let's say, you just want first three latest articles that have the Title element set and you want to load only a subset of.
 
@@ -180,10 +179,10 @@ Let's say, you just want first three latest articles that have the Title element
 // ...
 new Kontent<Article>(client)
     .WithQuery(
-        new NotEmptyFilter("$"elements.{Article.TitleCodename}""),
-        new OrderParameter("elements.post_date", SortOrder.Descending),
+        new NotEmptyFilter($"elements.{Article.TitleCodename}"),
+        new OrderParameter($"elements.{Article.PostDateCodename}", SortOrder.Descending),
         new LimitParameter(3),
-        new ElementsParameter("title", "summary", "post_date", "url_pattern")
+        new ElementsParameter(Article.TitleCodename, Article.SummaryCodeName, Article.PostDateCodename, Article.UrlPatternCodeName)
     )
 // ...
 ```
@@ -208,6 +207,22 @@ You can also use the structured content in your application. This is achieved by
 Both these content models can be used with Statiq, it's up to your preferences.
 
 Where ever Statiq hands you an `IDocument`, use the extension method `.AsKontent<TModel>()` to get the typed model from the document.
+
+
+## Accessing content
+
+Kontent.Statiq wraps the strong typed content model in a Statiq Document. In order to access the strong typed model within the document, a couple of helpers are available.
+| Example | Description |
+|------|------|
+| `.AsKontent<Page>()` | An extention on IDocument that gets the original Kontent item from the metadata |
+
+Within Statiq, configuration delegates are a powerful way to specify custom logic that is evaluated during processing of the content. Kontent.Statiq provides a couple of helpers to get access to the strongly typed Kontent model wrapped inside the Statiq Document.
+
+| Example | Description |
+|------|------|
+| `KontentConfig.As<Page>()` | Fetch the entire Kontent item |
+| `KontentConfig.Get((Page page) => page.Title)` | Fetch a single value from a Kontent item |
+| `KontentConfig.GetChildren<Page>(page => page.RelatedPages)` | Fetch a list of related content items from a property of the Kontent item.
 
 ## Working with images (optional)
 

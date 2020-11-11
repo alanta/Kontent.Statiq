@@ -23,6 +23,11 @@
     <AssemblyAttribute Include="Kentico.Kontent.Delivery.DeliverySourceTrackingHeader" />
   </ItemGroup>
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Kentico.Kontent.Delivery" Version="14.0.0" />
     <PackageReference Include="Kentico.Kontent.ImageTransformation" Version="14.0.0" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="8.13.1.21947">

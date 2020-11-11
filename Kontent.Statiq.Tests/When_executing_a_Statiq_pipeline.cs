@@ -100,7 +100,7 @@ namespace Kontent.Statiq.Tests
             await engine.ExecuteAsync();
         }
 
-        public static Engine SetupExecution<TContent>(Kontent<TContent> kontentModule, Func<IReadOnlyList<IDocument>, Task> test ) where TContent : class
+        private static Engine SetupExecution<TContent>(Kontent<TContent> kontentModule, Func<IReadOnlyList<IDocument>, Task> test ) where TContent : class
         {
             var engine = new Engine();
             var pipeline = new Pipeline()

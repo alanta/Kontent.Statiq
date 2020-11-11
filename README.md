@@ -105,7 +105,7 @@ Let's say, you just want first three latest articles that have the Title element
 // ...
 new Kontent<Article>(client)
     .WithQuery(
-        new NotEmptyFilter("elements.title"),
+        new NotEmptyFilter("$"elements.{Article.TitleCodename}""),
         new OrderParameter("elements.post_date", SortOrder.Descending),
         new LimitParameter(3),
         new ElementsParameter("title", "summary", "post_date", "url_pattern")
@@ -231,4 +231,3 @@ You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio
 ## Blog posts & docs
 
 [Static sites with Kentico Cloud, Statiq and Netlify](https://www.kenticotricks.com/blog/static-sites-with-kentico-cloud) Kristian Bortnik, 31 jan 2018
-

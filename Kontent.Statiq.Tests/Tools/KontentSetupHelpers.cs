@@ -15,5 +15,15 @@ namespace Kontent.Statiq.Tests.Tools
 
             return client;
         }
+
+        public static IDeliveryClient WithFakeTaxonomy(this IDeliveryClient client, params ITaxonomyGroup[] taxonomies)
+        {
+            var response = A.Fake<IDeliveryTaxonomyListingResponse>();
+            A.CallTo(() => response.Taxonomies).Returns(taxonomies);
+            A.CallTo(() => client.GetTaxonomiesAsync(A<IEnumerable<IQueryParameter>>._))
+                .Returns(response);
+
+            return client;
+        }
     }
 }

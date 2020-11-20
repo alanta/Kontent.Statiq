@@ -12,6 +12,8 @@ namespace Kontent.Statiq
         /// The key used in Statiq documents to store the Kontent item.
         /// </summary>
         public const string KontentItemKey = "KONTENT";
+        public const string KontentTaxonomyGroupKey = "KONTENT-TAXONOMY-GROUP";
+        public const string KontentTaxonomyTermsKey = "KONTENT-TAXONOMY-TERMS";
 
         /// <summary>
         /// Return the strong typed model for a Statiq document.

@@ -21,7 +21,7 @@ namespace Kontent.Statiq
         /// <returns>An array of <see cref="KontentImageDownload"/> objects listing the image substitutions performed by <see cref="KontentImageProcessor"/>.</returns>
         public static KontentImageDownload[] GetKontentImageDownloads(this IDocument doc)
         {
-            return doc.Get<KontentImageDownload[]>(KontentImageProcessor.KontentAssetDownloadKey) ?? Array.Empty<KontentImageDownload>();
+            return doc.Get<KontentImageDownload[]>(KontentKeys.Images.Downloads) ?? Array.Empty<KontentImageDownload>();
         }
 
         /// <summary>

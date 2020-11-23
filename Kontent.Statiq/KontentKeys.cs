@@ -35,5 +35,14 @@
             /// </summary>
             public const string LastModified = "system.lastmodified";
         }
+
+        public static class Images
+        {
+            /// <summary>
+            /// The key used by the <see cref="KontentImageProcessor"/> and <see cref="KontentDownloadImages"/> modules to handle
+            /// images that need to be downloaded.
+            /// </summary>
+            public const string Downloads = "KONTENT-ASSET-DOWNLOADS";
+        }
     }
 }

@@ -80,26 +80,29 @@ using Statiq.Common;
 using Statiq.Core;
 using My.Models; // <== your model namespace
 
-public class ArticlesPipeline : Pipeline
+namespace My // <== your namespace
 {
-    public ArticlesPipeline(IDeliveryClient client)
-    {
-        InputModules = new ModuleList{
-            // Load all articles from Kontent,
-            new Kontent<Article>(client)
-                // Use the BodyContent field as the document content
-                .WithContent(page => page.BodyContent),
+  public class ArticlesPipeline : Pipeline
+  {
+      public ArticlesPipeline(IDeliveryClient client)
+      {
+          InputModules = new ModuleList{
+              // Load all articles from Kontent,
+              new Kontent<Article>(client)
+                  // Use the BodyContent field as the document content
+                  .WithContent(page => page.BodyContent),
 
-            // Set the output path for each article
-            new SetDestination(Config.FromDocument((doc, ctx)  
-              => new NormalizedPath( $"article/{doc.AsKontent<Article>().UrlPattern}.html"))),
-        };
+              // Set the output path for each article
+              new SetDestination(Config.FromDocument((doc, ctx)  
+                => new NormalizedPath( $"article/{doc.AsKontent<Article>().UrlPattern}.html"))),
+          };
 
-        OutputModules = new ModuleList {
-            // Write each article to disk
-            new WriteFiles()
-        };
-    }
+          OutputModules = new ModuleList {
+              // Write each article to disk
+              new WriteFiles()
+          };
+      }
+  }
 }
 ```
 
@@ -134,32 +137,35 @@ using Statiq.Core;
 using Statiq.Razor;
 using My.Models; // <== your model namespace
 
-public class ArticlesPipeline : Pipeline
+namespace My // <== your namespace
 {
-    public ArticlesPipeline(IDeliveryClient client)
-    {
-        InputModules = new ModuleList{
-            // Load all articles from Kontent
-            new Kontent<Article>(client), 
-            // Set the output path for each article
-            new SetDestination(KontentConfig.Get( 
-                (Article item) => new NormalizedPath( $"article/{item.UrlPattern}.html"))),
-        };
+  public class ArticlesPipeline : Pipeline
+  {
+      public ArticlesPipeline(IDeliveryClient client)
+      {
+          InputModules = new ModuleList{
+              // Load all articles from Kontent
+              new Kontent<Article>(client), 
+              // Set the output path for each article
+              new SetDestination(KontentConfig.Get( 
+                  (Article item) => new NormalizedPath( $"article/{item.UrlPattern}.html"))),
+          };
 
-        ProcessModules = new ModuleList {
-            // Pull in the Razor view, the path is relative to /input
-            new MergeContent(new ReadFiles(patterns: "_Article.cshtml") ),
-            // Render the Razor view into the content of the document
-            new RenderRazor()
-                // Use the strongly-typed model for the Razor view
-                .WithModel(KontentConfig.As<Article>())
-        };
+          ProcessModules = new ModuleList {
+              // Pull in the Razor view, the path is relative to /input
+              new MergeContent(new ReadFiles(patterns: "_Article.cshtml") ),
+              // Render the Razor view into the content of the document
+              new RenderRazor()
+                  // Use the strongly-typed model for the Razor view
+                  .WithModel(KontentConfig.As<Article>())
+          };
 
-        OutputModules = new ModuleList {
-            // Write each article to disk
-            new WriteFiles()
-        };
-    }
+          OutputModules = new ModuleList {
+              // Write each article to disk
+              new WriteFiles()
+          };
+      }
+  }
 }
 ```
 

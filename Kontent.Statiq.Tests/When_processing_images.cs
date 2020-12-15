@@ -54,6 +54,29 @@ namespace Kontent.Statiq.Tests
         }
 
         [Theory,
+         InlineData("https://the.cms/images/image1.jpg", "/images", "/images/image1.jpg"),
+         InlineData("https://the.cms/images/image2.jpg", "unrootedPath/test", "/unrootedPath/test/image2.jpg"),
+         InlineData("https://the.cms/images/image1.jpg?w=110&h=340", "/thumbnails/", "/thumbnails/2cddd89b6d47fa06efe3e14ceada65c7-image1.jpg")]
+        public async Task It_should_apply_config_for_local_path(string sourceUrl, string path, string localUrl)
+        {
+            // Given 
+            string content = $"<img src='{sourceUrl}'/>";
+
+            var document = new TestDocument(content);
+
+            // When
+
+            var assetParser = new KontentImageProcessor().WithLocalPath(Config.FromValue(new NormalizedPath(path)));
+            var output = await ExecuteAsync(new[] { document }, assetParser);
+
+            // Then
+            output.Length.Should().Be(1);
+            var outputDoc = output[0];
+
+            outputDoc.Content.Should().Contain($"src=\"{localUrl}\"");
+        }
+
+        [Theory,
          InlineData("<meta property=\"og:image\" content=\"https://the.cms/images/image1.jpg\"/>", "", "/assets/img/image1.jpg"),
          InlineData("<meta property=\"og:image\" content=\"https://the.cms/images/image1.jpg\"/>", "test.alanta.nl", "https://test.alanta.nl/assets/img/image1.jpg")
          ]

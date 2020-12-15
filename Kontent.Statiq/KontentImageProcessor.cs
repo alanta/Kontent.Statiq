@@ -23,8 +23,7 @@ namespace Kontent.Statiq
     /// </summary>
     public class KontentImageProcessor : Module
     {
-        internal const string KontentAssetDownloadKey = "KONTENT-ASSET-DOWNLOADS";
-        private NormalizedPath _localBasePath = "img";
+        private Config<NormalizedPath> _localBasePath = Config.FromValue(new NormalizedPath("img"));
         private Func<string, bool>? _urlFilter;
 
         /// <summary>
@@ -34,7 +33,23 @@ namespace Kontent.Statiq
         /// <returns></returns>
         public KontentImageProcessor WithLocalPath(string path)
         {
-            _localBasePath = path;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
+            }
+
+            _localBasePath = Config.FromValue(new NormalizedPath(path));
+            return this;
+        }
+
+        /// <summary>
+        /// Set the local path for downloaded images. Default is <em>/img</em>.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public KontentImageProcessor WithLocalPath(Config<NormalizedPath> path)
+        {
+            _localBasePath = path ?? throw new ArgumentNullException(nameof(path));
             return this;
         }
 
@@ -58,6 +73,7 @@ namespace Kontent.Statiq
                 return input.Yield();
 
             var downloadUrls = new List<KontentImageDownload>();
+            var localBasePath = await _localBasePath.GetValueAsync(input, context);
 
             foreach (var image in html.Images)
             {
@@ -69,7 +85,7 @@ namespace Kontent.Statiq
 
                 if (!string.IsNullOrWhiteSpace(image.SourceSet))
                 {
-                    var (sourceSet, downloads) = ProcessSourceSet(image.SourceSet, context);
+                    var (sourceSet, downloads) = ProcessSourceSet(image.SourceSet, localBasePath, context);
                     image.SourceSet = sourceSet;
                     if (downloads.Any())
                     {
@@ -77,7 +93,8 @@ namespace Kontent.Statiq
                     }
                 }
 
-                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, _localBasePath);
+                
+                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
 
                 context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
 
@@ -96,7 +113,7 @@ namespace Kontent.Statiq
                     continue;
                 }
 
-                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, _localBasePath);
+                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
 
                 context.LogDebug("Replacing metadata image {0} => {1}", imageSource, localPath);
 
@@ -107,7 +124,7 @@ namespace Kontent.Statiq
             }
 
             return input.Clone(
-                new[] { new KeyValuePair<string, object>(KontentAssetDownloadKey, downloadUrls.ToArray()) },
+                new[] { new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls.ToArray()) },
                 await context.GetContentProviderAsync(
                     html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
                     MediaTypes.Html)).Yield();
@@ -126,7 +143,7 @@ namespace Kontent.Statiq
             return (!IsRemoteUrl(uri) || !(_urlFilter?.Invoke(uri) ?? true));
         }
 
-        private (string, KontentImageDownload[]) ProcessSourceSet(string sourceSet, IExecutionContext context)
+        private (string, KontentImageDownload[]) ProcessSourceSet(string sourceSet, NormalizedPath localBasePath, IExecutionContext context)
         {
             var downloads = new List<KontentImageDownload>();
             var newSourceSet = new List<string>();
@@ -142,7 +159,7 @@ namespace Kontent.Statiq
                 }
                 else
                 {
-                    var localPath = KontentAssetHelper.GetLocalFileName(url, _localBasePath);
+                    var localPath = KontentAssetHelper.GetLocalFileName(url, localBasePath);
                     context.LogDebug("Replacing srcset image {0} => {1}", url, localPath);
                     newSourceSet.Add($"{localPath} {size}".Trim());
                     downloads.Add(new KontentImageDownload(url, localPath));

@@ -13,6 +13,7 @@ namespace Kontent.Statiq.Tests.Tools
         public string Name { get; internal set; }
         public string Codename { get; internal set; }
         public string Type { get; internal set; }
+        public string Collection { get; }
         public IList<string> SitemapLocation { get; internal set; }
         public DateTime LastModified { get; internal set; }
         public string Language { get; internal set; }

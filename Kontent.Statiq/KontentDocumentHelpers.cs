@@ -34,7 +34,7 @@ namespace Kontent.Statiq
             return await CreateDocumentInternal(context, item, props, content).ConfigureAwait(false);
         }
 
-        internal static Task<IDocument> CreateDocumentInternal(IExecutionContext context, object item, PropertyInfo[] props, string content )
+        private static Task<IDocument> CreateDocumentInternal(IExecutionContext context, object item, PropertyInfo[] props, string content )
         {
             var metadata = new List<KeyValuePair<string, object>>
             {

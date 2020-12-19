@@ -54,8 +54,6 @@ namespace Kontent.Statiq
         /// <param name="metadata"></param>
         private static void MapSystemMetadata(object item, PropertyInfo[] props, List<KeyValuePair<string, object>> metadata)
         {
-            // TODO : add a check here to validate that this in fact a Kontent item?
-
             if (props.FirstOrDefault(prop => typeof(IContentItemSystemAttributes).IsAssignableFrom(prop.PropertyType))
                 ?.GetValue(item) is IContentItemSystemAttributes systemProp)
             {

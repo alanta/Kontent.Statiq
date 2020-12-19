@@ -53,6 +53,9 @@
             public const string Downloads = "KONTENT-ASSET-DOWNLOADS";
         }
 
+        /// <summary>
+        /// Keys for well-known Statiq document metadata for strong-typed taxonomy data.
+        /// </summary>
         public static class Taxonomy
         {
             /// <summary>

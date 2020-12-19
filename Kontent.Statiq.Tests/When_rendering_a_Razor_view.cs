@@ -10,19 +10,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Kontent.Statiq.Tests
 {
     public class When_rendering_a_Razor_view
     {
-        private readonly ITestOutputHelper _testOutput;
-
-        public When_rendering_a_Razor_view(ITestOutputHelper testOutput)
-        {
-            _testOutput = testOutput;
-        }
-
         [Fact]
         public async Task It_should_pickup_Layout_and_view_start()
         {

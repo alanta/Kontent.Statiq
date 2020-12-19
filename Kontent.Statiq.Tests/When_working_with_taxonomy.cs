@@ -289,10 +289,10 @@ namespace Kontent.Statiq.Tests
 
     internal class TestTaxonomyGroupSystemAttributes : ITaxonomyGroupSystemAttributes
     {
-        public string Codename { get; set; }
-        public string Id { get; set; }
+        public string Codename { get; set; } = "";
+        public string Id { get; set; } = "";
         public DateTime LastModified { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
     }
 
     internal class TestTaxonomyGroup : ITaxonomyGroup

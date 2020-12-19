@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Kontent.Statiq
 {
+    /// <summary>
+    /// Module that retrieves Kontent taxonomy groups as a Statiq document structure.
+    /// <para>The output is a page structure for each group that matches the query. Child documents are child terms.</para>
+    /// </summary>
     public sealed class KontentTaxonomy : Module
     {
         private readonly IDeliveryClient _client;

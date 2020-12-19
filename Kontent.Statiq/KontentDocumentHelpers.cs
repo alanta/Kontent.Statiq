@@ -38,7 +38,7 @@ namespace Kontent.Statiq
         {
             var metadata = new List<KeyValuePair<string, object>>
             {
-                new KeyValuePair<string, object>(TypedContentExtensions.KontentItemKey, item),
+                new KeyValuePair<string, object>(KontentKeys.Item, item),
             };
             
             MapSystemMetadata(item, props, metadata);

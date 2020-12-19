@@ -6,6 +6,11 @@
     public static class KontentKeys
     {
         /// <summary>
+        /// The key used to store the Kontent item in Statiq document metadata.
+        /// </summary>
+        public const string Item = "KONTENT";
+        
+        /// <summary>
         /// Keys for well-known Statiq document metadata for Kontent system metadata.
         /// </summary>
         public static class System
@@ -36,6 +41,9 @@
             public const string LastModified = "system.lastmodified";
         }
 
+        /// <summary>
+        /// Keys for well-known Statiq document metadata for image processing.
+        /// </summary>
         public static class Images
         {
             /// <summary>
@@ -43,6 +51,22 @@
             /// images that need to be downloaded.
             /// </summary>
             public const string Downloads = "KONTENT-ASSET-DOWNLOADS";
+        }
+
+        public static class Taxonomy
+        {
+            /// <summary>
+            /// The key used to store the Kontent taxonomy group in Statiq document metadata.
+            /// </summary>
+            public const string Group = "KONTENT-TAXONOMY-GROUP";
+            /// <summary>
+            /// The key used to store the Kontent taxonomy terms in Statiq document metadata.
+            /// </summary>
+            public const string Terms = "KONTENT-TAXONOMY-TERMS";
+            /// <summary>
+            /// The key used to store the Kontent taxonomy term in Statiq document metadata.
+            /// </summary>
+            public const string Term = "KONTENT-TAXONOMY-TERM";
         }
     }
 }

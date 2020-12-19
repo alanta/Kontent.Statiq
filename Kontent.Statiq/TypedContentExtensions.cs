@@ -1,6 +1,7 @@
 ﻿using Kentico.Kontent.Delivery.Abstractions;
 using Statiq.Common;
 using System;
+using System.Linq;
 
 namespace Kontent.Statiq
 {
@@ -12,11 +13,9 @@ namespace Kontent.Statiq
         /// <summary>
         /// The key used in Statiq documents to store the Kontent item.
         /// </summary>
-        public const string KontentItemKey = "KONTENT";
-        public const string KontentTaxonomyGroupKey = "KONTENT-TAXONOMY-GROUP";
-        public const string KontentTaxonomyTermsKey = "KONTENT-TAXONOMY-TERMS";
-        public const string KontentTaxonomyTermKey = "KONTENT-TAXONOMY-TERM";
-
+        [Obsolete("Please use KontentKeys.Item instead")]
+        public const string KontentItemKey = KontentKeys.Item;
+        
         /// <summary>
         /// Return the strong typed model for a Statiq document.
         /// </summary>
@@ -31,7 +30,7 @@ namespace Kontent.Statiq
                 throw new ArgumentNullException(nameof(document), $"Expected a document of type {typeof(TModel).FullName}");
             }
 
-            if (document.TryGetValue(KontentItemKey, out TModel contentItem))
+            if (document.TryGetValue(KontentKeys.Item, out TModel contentItem))
             {
                 return contentItem;
             }
@@ -52,7 +51,7 @@ namespace Kontent.Statiq
                 throw new ArgumentNullException(nameof(document), "Expected a document but got <null>");
             }
 
-            if (document.TryGetValue(KontentTaxonomyGroupKey, out ITaxonomyGroup contentItem))
+            if (document.TryGetValue(KontentKeys.Taxonomy.Group, out ITaxonomyGroup contentItem))
             {
                 return contentItem;
             }
@@ -64,9 +63,7 @@ namespace Kontent.Statiq
         /// Return the strong typed model for a Statiq document.
         /// </summary>
         /// <param name="document">The Document.</param>
-        /// <typeparam name="TModel">The type of content to return.</typeparam>
-        /// <returns>The strong typed content model.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when this method is called on a document that doesn't a Kontent content item.</exception>
+        /// <returns>The taxonomy term or <c>null</c>.</returns>
         public static ITaxonomyTerm? AsKontentTaxonomyTerm(this IDocument document)
         {
             if (document == null)
@@ -74,9 +71,14 @@ namespace Kontent.Statiq
                 throw new ArgumentNullException(nameof(document), "Expected a document but got <null>");
             }
 
-            if (document.TryGetValue(KontentTaxonomyTermKey, out ITaxonomyTerm contentItem))
+            if (document.TryGetValue(KontentKeys.Taxonomy.Term, out ITaxonomyTerm term))
             {
-                return contentItem;
+                return term;
+            }
+            
+            if (document.TryGetValue(KontentKeys.Taxonomy.Term, out ITaxonomyTermDetails termDetails))
+            {
+                return TaxonomyTerm.CreateFrom(termDetails);
             }
 
             return null;
@@ -86,9 +88,7 @@ namespace Kontent.Statiq
         /// Return the strong typed model for a Statiq document.
         /// </summary>
         /// <param name="document">The Document.</param>
-        /// <typeparam name="TModel">The type of content to return.</typeparam>
-        /// <returns>The strong typed content model.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when this method is called on a document that doesn't a Kontent content item.</exception>
+        /// <returns>The taxonomy terms or an empty array.</returns>
         public static ITaxonomyTerm[] AsKontentTaxonomyTerms(this IDocument document)
         {
             if (document == null)
@@ -96,9 +96,14 @@ namespace Kontent.Statiq
                 throw new ArgumentNullException(nameof(document), "Expected a document but got <null>");
             }
 
-            if (document.TryGetValue(KontentTaxonomyTermsKey, out ITaxonomyTerm[] contentItem))
+            if (document.TryGetValue(KontentKeys.Taxonomy.Terms, out object? terms))
             {
-                return contentItem;
+                return terms switch
+                {
+                    ITaxonomyTerm[] items => items,
+                    ITaxonomyTermDetails[] details => details.Select(TaxonomyTerm.CreateFrom).ToArray(),
+                    _ => Array.Empty<ITaxonomyTerm>()
+                };
             }
 
             return Array.Empty<ITaxonomyTerm>();

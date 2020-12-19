@@ -17,7 +17,7 @@ namespace Kontent.Statiq
                 new KeyValuePair<string, object>(Keys.Title, item.System.Name),
                 new KeyValuePair<string, object>(Keys.GroupKey, item.System.Codename),
                 new KeyValuePair<string, object>(Keys.TreePath, treePath),
-                new KeyValuePair<string, object>(TypedContentExtensions.KontentTaxonomyGroupKey, item)
+                new KeyValuePair<string, object>(KontentKeys.Taxonomy.Group, item)
             };
 
             MapSystemMetadata(item, metadata);
@@ -26,7 +26,7 @@ namespace Kontent.Statiq
             {
                 var terms = await item.Terms.ParallelSelectAsync(async t => await CreateDocument(context, t, treePath));
                 metadata.Add(new KeyValuePair<string, object>(Keys.Children, terms));
-                metadata.Add(new KeyValuePair<string, object>(TypedContentExtensions.KontentTaxonomyTermsKey, item.Terms.Select(TaxonomyTerm.CreateFrom).ToArray()));
+                metadata.Add(new KeyValuePair<string, object>(KontentKeys.Taxonomy.Terms, item.Terms.ToArray()));
             }
 
             return await context.CreateDocumentAsync(metadata, "", "text/html");
@@ -42,14 +42,14 @@ namespace Kontent.Statiq
                 new KeyValuePair<string, object>(Keys.TreePath, treePath),
                 new KeyValuePair<string, object>(KontentKeys.System.Name, item.Name),
                 new KeyValuePair<string, object>(KontentKeys.System.CodeName, item.Codename),
-                new KeyValuePair<string, object>(TypedContentExtensions.KontentTaxonomyTermKey, TaxonomyTerm.CreateFrom(item))
+                new KeyValuePair<string, object>(KontentKeys.Taxonomy.Term, item)
             };
 
             if (item.Terms != null && item.Terms.Count > 0)
             {
                 var terms = await item.Terms.ParallelSelectAsync(async t => await CreateDocument(context, t, treePath));
                 metadata.Add(new KeyValuePair<string, object>(Keys.Children, terms));
-                metadata.Add(new KeyValuePair<string, object>(TypedContentExtensions.KontentTaxonomyTermsKey, item.Terms.Select( TaxonomyTerm.CreateFrom ).ToArray()));
+                metadata.Add(new KeyValuePair<string, object>(KontentKeys.Taxonomy.Terms, item.Terms.ToArray()));
             }
 
             return await context.CreateDocumentAsync(metadata, "", "text/html");
@@ -72,23 +72,6 @@ namespace Kontent.Statiq
                     new KeyValuePair<string, object>(KontentKeys.System.LastModified, item.System.LastModified),
                 });
             }
-        }
-    }
-
-    internal class TaxonomyTerm : ITaxonomyTerm
-    {
-        private TaxonomyTerm(string codename, string name)
-        {
-            Codename = codename;
-            Name = name;
-        }
-
-        public string Codename { get; }
-        public string Name { get; }
-
-        public static ITaxonomyTerm CreateFrom(ITaxonomyTermDetails details)
-        {
-            return new TaxonomyTerm(details.Codename, details.Name);
         }
     }
 }

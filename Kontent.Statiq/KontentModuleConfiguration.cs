@@ -30,6 +30,7 @@ namespace Kontent.Statiq
         /// <param name="sortOrder">Sort order</param>
         /// <typeparam name="TContentModel">The content model type.</typeparam>
         /// <returns>The module.</returns>
+        [Obsolete("Please use WithQuery to add query parameters instead.")]
         public static Kontent<TContentModel> OrderBy<TContentModel>(this Kontent<TContentModel> module, string field, SortOrder sortOrder) where TContentModel : class
         {
             if (!field.StartsWith("elements") && !field.StartsWith("system"))
@@ -48,6 +49,7 @@ namespace Kontent.Statiq
         /// <param name="skip">The number of items to skip.</param>
         /// <typeparam name="TContentModel">The content model type.</typeparam>
         /// <returns>The module.</returns>
+        [Obsolete("Please use WithQuery to add query parameters instead.")]
         public static Kontent<TContentModel> Skip<TContentModel>(this Kontent<TContentModel> module, int skip) where TContentModel : class
         {
             module.QueryParameters.Add(new SkipParameter(skip));
@@ -61,6 +63,7 @@ namespace Kontent.Statiq
         /// <param name="limit">The maximum number of items to return.</param>
         /// <typeparam name="TContentModel">The content model type.</typeparam>
         /// <returns>The module.</returns>
+        [Obsolete("Please use WithQuery to add query parameters instead.")]
         public static Kontent<TContentModel> Limit<TContentModel>(this Kontent<TContentModel> module, int limit) where TContentModel : class
         {
             module.QueryParameters.Add(new LimitParameter(limit));

@@ -5,7 +5,7 @@ namespace Kontent.Statiq
 {
     /// <summary>
     /// Comparer for Kontent taxonomy.
-    /// <para>Use this with <see cref="global::Statiq.Common.IDocumentToLookupExtensions.ToLookupMany{TKey}(IEnumerable{Statiq.Common.IDocument}, string, IEqualityComparer{TKey})"/></para>
+    /// <para>Use this with <see cref="global::Statiq.Common.IDocumentToLookupExtensions"/> to group content based on taxonomy terms.</para>
     /// </summary>
     public class TaxonomyTermComparer : IEqualityComparer<ITaxonomyTerm>
     {

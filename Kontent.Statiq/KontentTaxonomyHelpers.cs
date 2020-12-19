@@ -1,6 +1,5 @@
 ﻿using Kentico.Kontent.Delivery.Abstractions;
 using Statiq.Common;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

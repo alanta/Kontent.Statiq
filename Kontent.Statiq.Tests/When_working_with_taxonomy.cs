@@ -32,6 +32,7 @@ namespace Kontent.Statiq.Tests
         {
             // Arrange
             var group = SetupTaxonomyGroup("Test", "Test1", "Test2");
+            group.Terms.First().Terms.AddRange( CreateTaxonomyTerms("Test1a", "Test1b", "Test1c") );
             var deliveryClient = A.Fake<IDeliveryClient>().WithFakeTaxonomy( group );
 
             // Act
@@ -48,6 +49,7 @@ namespace Kontent.Statiq.Tests
             // Assert
             results.Should().HaveCount(1);
             results.First().GetChildren().Should().HaveCount(2);
+            results.First().GetChildren().First().GetChildren().Should().HaveCount(3);
         }
 
         [Fact]
@@ -260,17 +262,21 @@ namespace Kontent.Statiq.Tests
 
         private ITaxonomyGroup SetupTaxonomyGroup(string name, params string[] terms)
         {
-            return new TestTaxonomyGroup
+            var group = new TestTaxonomyGroup(new TestTaxonomyGroupSystemAttributes
             {
-                System = new TestTaxonomyGroupSystemAttributes
-                {
-                    Name = name,
-                    Codename = name.ToLower(),
-                    Id = Guid.NewGuid().ToString("N"),
-                    LastModified = DateTime.Now
-                },
-                Terms = terms.Select( t => new TestTaxonomyTermDetails{ Codename = t.ToLower(), Name = t }).Cast<ITaxonomyTermDetails>().ToList()
-            };
+                Name = name,
+                Codename = name.ToLower(),
+                Id = Guid.NewGuid().ToString("N"),
+                LastModified = DateTime.Now
+            });
+            group.Terms.AddRange(CreateTaxonomyTerms(terms));
+            return group;
+        }
+
+        private IList<ITaxonomyTermDetails> CreateTaxonomyTerms(params string[] terms)
+        {
+            return terms.Select(t => new TestTaxonomyTermDetails {Codename = t.ToLower(), Name = t})
+                .Cast<ITaxonomyTermDetails>().ToList();
         }
 
         private static Task<IPipelineOutputs> Execute(Pipeline pipeline)
@@ -291,20 +297,24 @@ namespace Kontent.Statiq.Tests
 
     internal class TestTaxonomyGroup : ITaxonomyGroup
     {
-        public ITaxonomyGroupSystemAttributes System { get; set; }
-        public IList<ITaxonomyTermDetails> Terms { get; set; }
+        public TestTaxonomyGroup(ITaxonomyGroupSystemAttributes system)
+        {
+            System = system;
+        }
+        public ITaxonomyGroupSystemAttributes System { get; }
+        public IList<ITaxonomyTermDetails> Terms { get; } = new List<ITaxonomyTermDetails>();
     }
 
     internal class TestTaxonomyTermDetails : ITaxonomyTermDetails
     {
-        public string Codename { get; set; }
-        public string Name { get; set; }
-        public IList<ITaxonomyTermDetails> Terms { get; set; }
+        public string Codename { get; set; } = "";
+        public string Name { get; set; } = "";
+        public IList<ITaxonomyTermDetails> Terms { get; } = new List<ITaxonomyTermDetails>();
     }
 
     internal class TestTaxonomyTerm : ITaxonomyTerm
     {
-        public string Codename { get; set; }
-        public string Name { get; set; }
+        public string Codename { get; set; } = "";
+        public string Name { get; set; } = "";
     }
 }

@@ -66,12 +66,22 @@ namespace Kontent.Statiq
         /// <returns>The taxonomy term or <c>null</c>.</returns>
         public static ITaxonomyTerm? AsKontentTaxonomyTerm(this IDocument document)
         {
+            return document.AsKontentTaxonomyTerm(KontentKeys.Taxonomy.Term);
+        }
+
+        /// <summary>
+        /// Return the strong typed model for a Statiq document.
+        /// </summary>
+        /// <param name="document">The Document.</param>
+        /// <returns>The taxonomy term or <c>null</c>.</returns>
+        public static ITaxonomyTerm? AsKontentTaxonomyTerm(this IDocument document, string key)
+        {
             if (document == null)
             {
                 throw new ArgumentNullException(nameof(document), "Expected a document but got <null>");
             }
 
-            if (document.TryGetValue(KontentKeys.Taxonomy.Term, out ITaxonomyTerm term))
+            if (document.TryGetValue(key, out ITaxonomyTerm term))
             {
                 return term;
             }
@@ -91,12 +101,23 @@ namespace Kontent.Statiq
         /// <returns>The taxonomy terms or an empty array.</returns>
         public static ITaxonomyTerm[] AsKontentTaxonomyTerms(this IDocument document)
         {
+            return document.AsKontentTaxonomyTerms(KontentKeys.Taxonomy.Terms);
+        }
+
+        /// <summary>
+        /// Return the strong typed model for a Statiq document.
+        /// </summary>
+        /// <param name="document">The Document.</param>
+        /// <param name="key"></param>
+        /// <returns>The taxonomy terms or an empty array.</returns>
+        public static ITaxonomyTerm[] AsKontentTaxonomyTerms(this IDocument document, string key)
+        {
             if (document == null)
             {
                 throw new ArgumentNullException(nameof(document), "Expected a document but got <null>");
             }
 
-            if (document.TryGetValue(KontentKeys.Taxonomy.Terms, out object? terms))
+            if (document.TryGetValue(key, out object? terms))
             {
                 return terms switch
                 {

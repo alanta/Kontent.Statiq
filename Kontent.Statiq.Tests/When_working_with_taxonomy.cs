@@ -41,6 +41,7 @@ namespace Kontent.Statiq.Tests
                 InputModules =
                 {
                     new KontentTaxonomy(deliveryClient)
+                        .WithNesting(),
                 }
             };
 
@@ -65,6 +66,7 @@ namespace Kontent.Statiq.Tests
                 InputModules =
                 {
                     new KontentTaxonomy(deliveryClient)
+                        .WithNesting()
                 }
             };
 
@@ -87,6 +89,7 @@ namespace Kontent.Statiq.Tests
                 InputModules =
                 {
                     new KontentTaxonomy(deliveryClient)
+                        .WithNesting()
                 }
             };
 
@@ -109,7 +112,8 @@ namespace Kontent.Statiq.Tests
             {
                 InputModules =
                 {
-                    new KontentTaxonomy(deliveryClient),
+                    new KontentTaxonomy(deliveryClient)
+                        .WithNesting(),
                     new FlattenTree(),
                     new SetDestination(Config.FromDocument((doc,ctx)=>
                         new NormalizedPath( doc.Get<string>(KontentKeys.System.Name)))),
@@ -182,10 +186,12 @@ namespace Kontent.Statiq.Tests
         {
             // Arrange
             var group = SetupTaxonomyGroup("Menu", "Product", "Recipe", "Featured");
+            group.Terms.First().Terms.AddRange(CreateTaxonomyTerms("Sugar-free","Vegan","Low-carb"));
 
             var recipe = new TestTaxonomyTerm { Codename = "recipe", Name = "Recipe" };
             var featured = new TestTaxonomyTerm { Codename = "featured", Name = "Featured" };
             var product = new TestTaxonomyTerm { Codename = "product", Name = "Product" };
+            var lowCarb = new TestTaxonomyTerm {Codename = "low-carb", Name = "Low-carb"};
 
             var articles = new[]
             {
@@ -206,6 +212,12 @@ namespace Kontent.Statiq.Tests
                     System = new TestContentItemSystemAttributes(){ Name = "buy-cookies"},
                     Title = "Chocolate chip cookies",
                     Sitemap = new ITaxonomyTerm[] { product, featured }
+                },
+                new Article
+                {
+                    System = new TestContentItemSystemAttributes(){ Name = "low-carb-cookies"},
+                    Title = "Low-carb cookies",
+                    Sitemap = new ITaxonomyTerm[] { product, lowCarb }
                 }
             };
 
@@ -218,7 +230,10 @@ namespace Kontent.Statiq.Tests
             {
                 InputModules =
                 {
-                    new Kontent<Article>(deliveryClient)
+                    new Kontent<Article>(deliveryClient),
+                    // Set taxonomy terms as metadata
+                    new SetMetadata("Tags", KontentConfig.Get((Article art) => art.Sitemap)),
+                    new GroupDocuments( "Tags" ).WithComparer(new TaxonomyTermComparer())
                 }
             };
 
@@ -229,16 +244,16 @@ namespace Kontent.Statiq.Tests
                 {
                     new KontentTaxonomy(deliveryClient)
                         .WithQuery(new EqualsFilter("system.codename", "menu")),
-                    new FlattenTree(),
                 },
                 ProcessModules = {
                     new SetMetadata( Keys.Children, Config.FromDocument((doc, ctx) =>
                     {
+                        var taxonomyTerm = doc.AsKontentTaxonomyTerm()?.Codename;
+
                         return ctx.Outputs.FromPipeline("Articles")
-                            .Where( art => art.AsKontent<Article>().Sitemap
-                                .Contains(doc.AsKontentTaxonomyTerm()!, new TaxonomyTermComparer()) )
-                            .ToArray();
-                    }) )
+                            .FirstOrDefault(x => x.AsKontentTaxonomyTerm(Keys.GroupKey)?.Codename == taxonomyTerm)
+                            ?.GetChildren().ToArray();
+                    }))
                 }
             };
 
@@ -252,11 +267,18 @@ namespace Kontent.Statiq.Tests
 
             // Assert
             var sitemap = results.FromPipeline("Menu");
+            sitemap.Select(node => node.Get<string>(Keys.Title))
+                .Should().BeEquivalentTo("Product", "Featured", "Vegan", "Low-carb", "Recipe", "Sugar-free");
             
             var productSection = sitemap.FirstOrDefault( p => p.Get<string>(Keys.Title) == "Product" );
-            productSection.GetChildren().Should().HaveCount(1);
+            productSection.GetChildren().Should().HaveCount(2);
+            var lowCarbSection = sitemap.FirstOrDefault( p => p.Get<string>(Keys.Title) == "Low-carb" );
+            lowCarbSection.GetChildren().Should().HaveCount(1);
+            lowCarbSection.Get<string[]>(Keys.TreePath).Should().Equal( "product", "low-carb");
             var featuredSection = sitemap.FirstOrDefault(p => p.Get<string>(Keys.Title) == "Featured");
             featuredSection.GetChildren().Should().HaveCount(2);
+            
+            _output.WriteLine( string.Join("\n", sitemap.Select( doc => string.Join( "/", doc.Get<string[]>(Keys.TreePath)) + $" ({doc.GetChildren().Count})")));
         }
 
 

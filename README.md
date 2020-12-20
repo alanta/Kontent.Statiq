@@ -214,7 +214,6 @@ Both these content models can be used with Statiq, it's up to your preferences.
 
 Where ever Statiq hands you an `IDocument`, use the extension method `.AsKontent<TModel>()` to get the typed model from the document.
 
-
 ## Accessing content
 
 Kontent.Statiq wraps the strong typed content model in a Statiq Document. In order to access the strong typed model within the document, a couple of helpers are available.
@@ -292,6 +291,141 @@ public class DownloadImages : Pipeline
 
 The `KontentImageProcessor` will add any replaced image url to a collection in the Document metadata for processing by the `KontentDownloadImages` module at a later stage.
 
+## Taxonomy
+
+The `KontentTaxonomy` module allows you to get the taxonomies defined in Kontent. You can download a specific taxonomy group or a single group using filters.
+
+```csharp
+public class Taxonomies : Pipeline
+{
+    public Taxonomies(IDeliveryClient client)
+    {
+        PostProcessModules = new ModuleList(
+            // Load the taxonomy named 'menu'
+            new KontentTaxonomy(client)
+                .WithQuery(new EqualsFilter("system.codename", "menu"))
+        );
+    }
+}
+```
+This will return all the terms for the taxonomy group _menu_ as a list. For convenience the root node is skipped because you cannot select the root node as a tag in Kontent.
+
+### Returning a tree or the root node
+
+Using the `.WithNesting(nesting:true, collapseRoot:false)` method on the module, you can make the module return a hierarchical structure of documents and control whether the root node is returned as well.
+
+```csharp
+public class Taxonomies : Pipeline
+{
+    public Taxonomies(IDeliveryClient client)
+    {
+        PostProcessModules = new ModuleList(
+            // Load the taxonomy named 'menu'
+            new KontentTaxonomy(client)
+                .WithQuery(new EqualsFilter("system.codename", "menu"))
+        );
+    }
+}
+```
+
+To flatten this into a list, use the [`FlattenTree`](https://github.com/statiqdev/Statiq.Framework/blob/main/src/core/Statiq.Core/Modules/Metadata/FlattenTree.cs) module.
+
+### Grouping documents by taxonomy
+
+If you add a taxonomy field to one of your content types, this will result in a property of type `IEnumerable<ITaxonomyTerm>` in the generated model class. You can match these terms up to a taxonomy group to get a structured set of pages. This enables you to [manage the structure of the site using taxonomy](https://docs.kontent.ai/tutorials/develop-apps/optimize-your-app/sitemaps-for-seo#a-tag-items-with-a-taxonomy-to-create-a-sitemap) or generate an overview of documents per tag. Note that you don't need to load the entire taxonomy if you don't need that structure.
+
+```csharp
+new Pipeline
+{
+    InputModules =
+    {
+        new Kontent<Article>(deliveryClient),
+        // Set taxonomy terms as metadata
+        new SetMetadata("Tags", KontentConfig.Get((Article art) => art.Tags)),
+        // Group by taxonomy
+        new GroupDocuments( "Tags" )
+            .WithComparer(new TaxonomyTermComparer())
+    }
+}
+```
+The output for this pipeline is a flat list of documents, one for each taxonomy term with the documents for that term as its children. 
+The taxonomy term on each document is avalailable through `doc.AsTaxonomyTerm(Keys.GroupKey)`.
+
+### Structuring documents by taxonomy
+
+If you do need the structure of the taxonomy, for example to build a sitemap, you can join content to the taxonomy data returned by the `KontentTaxonomy` module.
+
+```csharp
+var articlePipeline = new Pipeline
+{
+    InputModules =
+    {
+        // Load all articles
+        new Kontent<Article>(deliveryClient),
+        // Set taxonomy terms as metadata
+        new SetMetadata("Tags", KontentConfig.Get((Article art) => art.Sitemap)),
+        // Group the articles by tag
+        new GroupDocuments( "Tags" ).WithComparer(new TaxonomyTermComparer())
+    }
+};
+
+var sitemapPipeline = new Pipeline
+{
+    Dependencies = { "Articles" },
+    InputModules =
+    {
+        // Load the taxonomy as a flat list
+        new KontentTaxonomy(deliveryClient)
+            .WithQuery(new EqualsFilter("system.codename", "menu")),
+    },
+    ProcessModules = {
+        new SetMetadata( Keys.Children, Config.FromDocument((doc, ctx) =>
+        {
+            var taxonomyTerm = doc.AsKontentTaxonomyTerm().Codename;
+
+            // Find the articles for this term
+            return ctx.Outputs.FromPipeline("Articles")
+                .FirstOrDefault( x => x.AsKontentTaxonomyTerm(Keys.GroupKey)?.Codename==taxonomyTerm)
+                ?.GetChildren()
+                .ToArray();
+        }))
+    }
+};
+```
+
+The output of the sitemap pipeline is a flat list of nodes representing the taxonomy terms. Each nodes children are the documents that are tagged with that term.
+
+Note that the path to each node in the tree is available through `doc.Get<string>(Keys.TreePath)`.
+
+### Taxonomy helpers
+
+Extensions on `IDocument` that can be used with documents loaded through the `KontentTaxonomy` module:
+
+| Example | Description |
+|------|------|
+| `.AsKontentTaxonomy()` | Fetch the entire `ITaxonomyGroup` from a root taxonomy document. |
+| `.AsKontentTaxonomyTerm()` | Fetch a single term from an IDocument |
+| `.AsKomtentTaxonomyTerms()` | Fetch a list of child terms from an IDocument, if any.
+
+### Taxonomy metadata
+
+All the keys used by the Modules provided are listed in the [KontentKeys](https://github.com/alanta/Kontent.Statiq/blob/main/Kontent.Statiq/KontentKeys.cs) class.
+For most cases there is a helper or extension to access the metadata but if you need direct access, you can use these keys to do so.
+
+| Key | Value |
+|------|------|
+| `Keys.Title` | The name of the term or group |
+| `Keys.GroupKey` | The code name of the term or group |
+| `Keys.TreePath` | A `string[]` containing the path of the node in the taxonomy by code name |
+| `Keys.Children` | The list of child terms as Statiq `IDocument` |
+| `KontentKeys.Taxonomy.Terms` | The child terms as `ITaxonomyTermDetails[]` |
+| `KontentKeys.Taxonomy.Group` | The taxonomy group as `ITaxonomyGroup` |
+| `KontentKeys.Taxonomy.Term` | The taxonomy term as `ITaxonomyTermDetails` |
+| `KontentKeys.System.Name` | The name of the term or group |
+| `KontentKeys.System.CodeName` | The code name of the term or group |
+| `KontentKeys.System.Id` | The id of the group (not available for terms) |
+| `KontentKeys.System.LastModified` | The `DateTime` the group was last modified (not available for terms) |
+
 ## Troubleshooting
 
 > There are weird object tags like this in my content: 
@@ -300,11 +434,15 @@ The `KontentImageProcessor` will add any replaced image url to a collection in t
 <object type="application/kenticocloud" data-type="item" data-rel="component" data-codename="n2ef9e997_4691_0118_8777_c0ac9cee683b"></object>
 ```
 
-Make sure you read the section on structured content and follow the configuration steps.
+This means that the Kontent Delivery SDK was unable to resolve the type of content included in your rich text field. Make sure you read the section on structured content and follow the configuration steps.
 
 > Links to other pages don't work
 
 Implement and register a link resolver. See the [Kontent docs](https://github.com/Kentico/kontent-delivery-sdk-net/wiki/Resolving-Links-to-Content-Items) for more information.
+
+> Null reference while rendering Razor
+
+Make sure all your classes are in a namespace.
 
 ## How do I build this repo?
 

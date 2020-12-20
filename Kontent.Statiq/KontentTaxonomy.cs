@@ -1,6 +1,5 @@
 ﻿using Kentico.Kontent.Delivery.Abstractions;
 using Statiq.Common;
-using Statiq.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace Kontent.Statiq
     public sealed class KontentTaxonomy : Module
     {
         private readonly IDeliveryClient _client;
-        private bool _nesting = false;
+        private bool _nesting;
         private bool _collapseRoot = true;
 
         internal List<IQueryParameter> QueryParameters { get; } = new List<IQueryParameter>();

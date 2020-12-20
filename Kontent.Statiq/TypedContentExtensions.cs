@@ -63,18 +63,9 @@ namespace Kontent.Statiq
         /// Return the strong typed model for a Statiq document.
         /// </summary>
         /// <param name="document">The Document.</param>
+        /// <param name="key">The metadata key to fetch the term from.</param>
         /// <returns>The taxonomy term or <c>null</c>.</returns>
-        public static ITaxonomyTerm? AsKontentTaxonomyTerm(this IDocument document)
-        {
-            return document.AsKontentTaxonomyTerm(KontentKeys.Taxonomy.Term);
-        }
-
-        /// <summary>
-        /// Return the strong typed model for a Statiq document.
-        /// </summary>
-        /// <param name="document">The Document.</param>
-        /// <returns>The taxonomy term or <c>null</c>.</returns>
-        public static ITaxonomyTerm? AsKontentTaxonomyTerm(this IDocument document, string key)
+        public static ITaxonomyTerm? AsKontentTaxonomyTerm(this IDocument document, string key = KontentKeys.Taxonomy.Term)
         {
             if (document == null)
             {
@@ -98,19 +89,9 @@ namespace Kontent.Statiq
         /// Return the strong typed model for a Statiq document.
         /// </summary>
         /// <param name="document">The Document.</param>
+        /// <param name="key">The metadata key to get the terms from.</param>
         /// <returns>The taxonomy terms or an empty array.</returns>
-        public static ITaxonomyTerm[] AsKontentTaxonomyTerms(this IDocument document)
-        {
-            return document.AsKontentTaxonomyTerms(KontentKeys.Taxonomy.Terms);
-        }
-
-        /// <summary>
-        /// Return the strong typed model for a Statiq document.
-        /// </summary>
-        /// <param name="document">The Document.</param>
-        /// <param name="key"></param>
-        /// <returns>The taxonomy terms or an empty array.</returns>
-        public static ITaxonomyTerm[] AsKontentTaxonomyTerms(this IDocument document, string key)
+        public static ITaxonomyTerm[] AsKontentTaxonomyTerms(this IDocument document, string key = KontentKeys.Taxonomy.Terms)
         {
             if (document == null)
             {

@@ -444,6 +444,10 @@ Implement and register a link resolver. See the [Kontent docs](https://github.co
 
 Make sure all your classes are in a namespace.
 
+> A _Bad request_ occurs while loading data from Kontent
+
+If you have a lot of content items, use the items-feed by calling `.WithItemsFeed()` method on the Kontent module.
+
 ## How do I build this repo?
 
 You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio, VS Code or Rider.

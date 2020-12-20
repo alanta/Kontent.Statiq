@@ -17,9 +17,11 @@ namespace Kontent.Statiq.Tests.Models
         public const string ThemeCodename = "theme";
         public const string TweetLinkCodename = "tweet_link";
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public IEnumerable<IMultipleChoiceOption> DisplayOptions { get; set; }
         public IContentItemSystemAttributes System { get; set; }
         public IEnumerable<IMultipleChoiceOption> Theme { get; set; }
         public string TweetLink { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }
 }

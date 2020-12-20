@@ -34,11 +34,11 @@ namespace Kontent.Statiq
             return await CreateDocumentInternal(context, item, props, content).ConfigureAwait(false);
         }
 
-        internal static Task<IDocument> CreateDocumentInternal(IExecutionContext context, object item, PropertyInfo[] props, string content )
+        private static Task<IDocument> CreateDocumentInternal(IExecutionContext context, object item, PropertyInfo[] props, string content )
         {
             var metadata = new List<KeyValuePair<string, object>>
             {
-                new KeyValuePair<string, object>(TypedContentExtensions.KontentItemKey, item),
+                new KeyValuePair<string, object>(KontentKeys.Item, item),
             };
             
             MapSystemMetadata(item, props, metadata);
@@ -54,8 +54,6 @@ namespace Kontent.Statiq
         /// <param name="metadata"></param>
         private static void MapSystemMetadata(object item, PropertyInfo[] props, List<KeyValuePair<string, object>> metadata)
         {
-            // TODO : add a check here to validate that this in fact a Kontent item?
-
             if (props.FirstOrDefault(prop => typeof(IContentItemSystemAttributes).IsAssignableFrom(prop.PropertyType))
                 ?.GetValue(item) is IContentItemSystemAttributes systemProp)
             {

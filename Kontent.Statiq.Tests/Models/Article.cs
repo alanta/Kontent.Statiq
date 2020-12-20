@@ -35,6 +35,7 @@ namespace Kontent.Statiq.Tests.Models
         public const string TitleCodename = "title";
         public const string UrlPatternCodename = "url_pattern";
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public IRichTextContent BodyCopy { get; set; }
         public string MetadataMetaDescription { get; set; }
         public string MetadataMetaTitle { get; set; }
@@ -57,5 +58,6 @@ namespace Kontent.Statiq.Tests.Models
         public IEnumerable<IAsset> TeaserImage { get; set; }
         public string Title { get; set; }
         public string UrlPattern { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }
 }

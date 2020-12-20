@@ -10,13 +10,12 @@ namespace Kontent.Statiq
 {
     /// <summary>
     /// Retrieves content items from Kontent.
+    /// <para>Use <c>.WithContent()</c> to specify what property to load content from and <c>.WithQuery()</c> to specify query parameters.</para>
     /// </summary>
+    /// <typeparam name="TContentModel">The content model.</typeparam>
     public sealed class Kontent<TContentModel> : Module where TContentModel : class
     {
-        /// <summary>
-        /// The code name of the field uses to fill the main Content field on the Statiq document. This is mostly useful for untyped content.
-        /// </summary>
-        public Func<TContentModel, string>? GetContent { get; set; }
+        internal Func<TContentModel, string>? GetContent { get; set; }
 
         private readonly IDeliveryClient _client;
 

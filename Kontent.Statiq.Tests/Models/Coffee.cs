@@ -37,6 +37,7 @@ namespace Kontent.Statiq.Tests.Models
         public const string UrlPatternCodename = "url_pattern";
         public const string VarietyCodename = "variety";
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public string Altitude { get; set; }
         public string Country { get; set; }
         public string Farm { get; set; }
@@ -61,5 +62,6 @@ namespace Kontent.Statiq.Tests.Models
         public IContentItemSystemAttributes System { get; set; }
         public string UrlPattern { get; set; }
         public string Variety { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }
 }

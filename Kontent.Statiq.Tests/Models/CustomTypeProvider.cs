@@ -24,14 +24,14 @@ namespace Kontent.Statiq.Tests.Models
             {typeof(Tweet), "tweet"}
         };
 
-        public Type GetType(string contentType)
+        public Type? GetType(string contentType)
         {
             return _codenames.Keys.FirstOrDefault(type => GetCodename(type).Equals(contentType));
         }
 
         public string GetCodename(Type contentType)
         {
-            return _codenames.TryGetValue(contentType, out var codename) ? codename : null;
+            return _codenames.TryGetValue(contentType, out var codename) ? codename : "";
         }
     }
 }

@@ -18,10 +18,12 @@ namespace Kontent.Statiq.Tests.Models
         public const string SitemapCodename = "sitemap";
         public const string TitleCodename = "title";
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public IEnumerable<IAsset> Image { get; set; }
         public IRichTextContent MarketingMessage { get; set; }
         public IEnumerable<ITaxonomyTerm> Sitemap { get; set; }
         public IContentItemSystemAttributes System { get; set; }
         public string Title { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }
 }

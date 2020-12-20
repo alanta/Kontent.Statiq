@@ -89,7 +89,7 @@ namespace Kontent.Statiq.Tests
             var deliveryClient = A.Fake<IDeliveryClient>().WithFakeContent(content);
 
             var sut = new Kontent<Article>(deliveryClient)
-                .WithContent(item => item.BodyCopy.ToString() );
+                .WithContent(item => item.BodyCopy.ToString() ?? "" );
 
             // Act
             var engine = SetupExecution(sut,

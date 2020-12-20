@@ -27,6 +27,7 @@ namespace Kontent.Statiq.Tests.Models
         public const string SitemapCodename = "sitemap";
         public const string UrlPatternCodename = "url_pattern";
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public IEnumerable<object> Facts { get; set; }
         public string MetadataMetaDescription { get; set; }
         public string MetadataMetaTitle { get; set; }
@@ -41,5 +42,6 @@ namespace Kontent.Statiq.Tests.Models
         public IEnumerable<ITaxonomyTerm> Sitemap { get; set; }
         public IContentItemSystemAttributes System { get; set; }
         public string UrlPattern { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }
 }

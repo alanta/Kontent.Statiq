@@ -18,6 +18,7 @@ namespace Kontent.Statiq
         internal Func<TContentModel, string>? GetContent { get; set; }
 
         private readonly IDeliveryClient _client;
+        private bool _useItemFeed;
 
         internal List<IQueryParameter> QueryParameters { get; } = new List<IQueryParameter>();
 
@@ -29,16 +30,50 @@ namespace Kontent.Statiq
         public Kontent(IDeliveryClient client)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client), $"{nameof(client)} must not be null");
+            _useItemFeed = false;
         }
 
+        /// <summary>
+        /// Use the items-feed endpoint instead of the items endpoint.
+        /// <para>Use this when you have a lot of content and get a bad request response.</para>
+        /// </summary>
+        /// <returns>The module.</returns>
+        public Kontent<TContentModel> WithItemsFeed()
+        {
+            _useItemFeed = true;
+            return this;
+        }
+        
         /// <inheritdoc />
         protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
         {
-            var items = await _client.GetItemsAsync<TContentModel>(QueryParameters);
+            if (_useItemFeed)
+            {
+                var feed = _client.GetItemsFeed<TContentModel>(QueryParameters);
 
-            var documentTasks = items.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
+                var documents = new List<IDocument>();
+                
+                while (feed.HasMoreResults)
+                {
+                    var nextBatch = await feed.FetchNextBatchAsync();
+                    
+                    var documentTasks = nextBatch.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
+                    
+                    var documentBatch = await Task.WhenAll(documentTasks);
+                    
+                    documents.AddRange(documentBatch);
+                }
 
-            return await Task.WhenAll(documentTasks);
+                return documents;
+            }
+            else
+            {
+                var items = await _client.GetItemsAsync<TContentModel>(QueryParameters);
+
+                var documentTasks = items.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
+
+                return await Task.WhenAll(documentTasks);    
+            }
         }
     }
 }

@@ -57,11 +57,9 @@ namespace Kontent.Statiq
                 {
                     var nextBatch = await feed.FetchNextBatchAsync();
                     
-                    var documentTasks = nextBatch.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
+                    var outputDocuments = nextBatch.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
                     
-                    var documentBatch = await Task.WhenAll(documentTasks);
-                    
-                    documents.AddRange(documentBatch);
+                    documents.AddRange(outputDocuments);
                 }
 
                 return documents;
@@ -70,9 +68,7 @@ namespace Kontent.Statiq
             {
                 var items = await _client.GetItemsAsync<TContentModel>(QueryParameters);
 
-                var documentTasks = items.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
-
-                return await Task.WhenAll(documentTasks);    
+                return items.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
             }
         }
     }

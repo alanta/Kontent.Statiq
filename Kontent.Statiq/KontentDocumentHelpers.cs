@@ -13,28 +13,28 @@ namespace Kontent.Statiq
     /// </summary>
     internal static class KontentDocumentHelpers
     {
-        internal static async Task<IDocument> CreateDocument<TContentModel>(IExecutionContext context, TContentModel item, Func<TContentModel, string>? getContent) where TContentModel : class
+        internal static IDocument CreateDocument<TContentModel>(IExecutionContext context, TContentModel item, Func<TContentModel, string>? getContent) where TContentModel : class
         {
             var props = typeof(TContentModel).GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy |
                                                             BindingFlags.GetProperty | BindingFlags.Public);
 
             var content = getContent?.Invoke(item) ?? "";
 
-            return await CreateDocumentInternal(context, item, props, content).ConfigureAwait(false);
+            return CreateDocumentInternal(context, item, props, content);
 
         }
 
-        internal static async Task<IDocument> CreateDocument(IExecutionContext context, object item, Func<object, string>? getContent)
+        internal static IDocument CreateDocument(IExecutionContext context, object item, Func<object, string>? getContent)
         {
             var props = item.GetType().GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy |
                                                      BindingFlags.GetProperty | BindingFlags.Public);
 
             var content = getContent?.Invoke(item) ?? "";
-            
-            return await CreateDocumentInternal(context, item, props, content).ConfigureAwait(false);
+
+            return CreateDocumentInternal(context, item, props, content);
         }
 
-        private static Task<IDocument> CreateDocumentInternal(IExecutionContext context, object item, PropertyInfo[] props, string content )
+        private static IDocument CreateDocumentInternal(IExecutionContext context, object item, PropertyInfo[] props, string content )
         {
             var metadata = new List<KeyValuePair<string, object>>
             {
@@ -43,7 +43,7 @@ namespace Kontent.Statiq
             
             MapSystemMetadata(item, props, metadata);
 
-            return context.CreateDocumentAsync(metadata, content, "text/html");
+            return context.CreateDocument(metadata, content, "text/html");
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace Kontent.Statiq
             }
             
             var metadata = BuildRootNode(item, treePath, terms);
-            var root = await context.CreateDocumentAsync(metadata, "", "text/html");
+            var root = context.CreateDocument(metadata, "", "text/html");
             return root.Yield();
         }
 
@@ -81,7 +81,7 @@ namespace Kontent.Statiq
                 metadata.Add(new KeyValuePair<string, object>(KontentKeys.Taxonomy.Terms, item.Terms.ToArray()));
             }
 
-            return await context.CreateDocumentAsync(metadata, "", "text/html");
+            return context.CreateDocument(metadata, "", "text/html");
         }
     }
 }

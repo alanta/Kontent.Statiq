@@ -20,7 +20,7 @@ namespace Kontent.Statiq
         {
             if (getChildren == null) throw new ArgumentNullException(nameof(getChildren));
 
-            return Config.FromDocument<IEnumerable<IDocument>>( async (doc, ctx) =>
+            return Config.FromDocument<IEnumerable<IDocument>>( (doc, ctx) =>
             {
                 var list = new List<IDocument>();
                 var parent = doc.AsKontent<TContentType>();
@@ -30,7 +30,7 @@ namespace Kontent.Statiq
                     var children = getChildren(parent)?.ToArray() ?? Array.Empty<object>();
                     foreach (var item in children)
                     {
-                        list.Add(await KontentDocumentHelpers.CreateDocument(ctx, item, null));
+                        list.Add(KontentDocumentHelpers.CreateDocument(ctx, item, null));
                     }
                 }
 

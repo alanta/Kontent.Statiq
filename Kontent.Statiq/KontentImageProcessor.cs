@@ -92,7 +92,6 @@ namespace Kontent.Statiq
                         downloadUrls.AddRange(downloads);
                     }
                 }
-
                 
                 var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
 
@@ -125,7 +124,7 @@ namespace Kontent.Statiq
 
             return input.Clone(
                 new[] { new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls.ToArray()) },
-                await context.GetContentProviderAsync(
+                context.GetContentProvider(
                     html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
                     MediaTypes.Html)).Yield();
         }
@@ -136,7 +135,6 @@ namespace Kontent.Statiq
                    && ( (element.GetAttribute("Property")?.Contains("image", StringComparison.OrdinalIgnoreCase) ?? false) || (element.GetAttribute(AttributeNames.Name)?.Contains("image", StringComparison.OrdinalIgnoreCase) ?? false))
                    && ( element.GetAttribute(AttributeNames.Content)?.StartsWith("http", StringComparison.OrdinalIgnoreCase) ?? false);
         }
-
 
         private bool SkipImage(string uri)
         {

@@ -33,7 +33,7 @@ namespace Kontent.Statiq
                 var asset = assets.FirstOrDefault(a => a.OriginalUrl == downloadedUrl);
                 if (asset != null)
                 {
-                    downloadsWithDestination.Add(download.Clone(asset.LocalPath.ToString().TrimStart('/')));
+                    downloadsWithDestination.Add(download.Clone(destination: asset.LocalPath.ToString().TrimStart('/')));
                 }
                 else
                 {

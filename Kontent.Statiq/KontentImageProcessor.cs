@@ -1,4 +1,6 @@
 ﻿using AngleSharp;
+using AngleSharp.Css.Dom;
+using AngleSharp.Css.Parser;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -75,35 +77,19 @@ namespace Kontent.Statiq
             var downloadUrls = new List<KontentImageDownload>();
             var localBasePath = await _localBasePath.GetValueAsync(input, context);
 
-            foreach (var image in html.Images)
-            {
-                var imageSource = image.Source;
-                if (SkipImage(imageSource))
-                {
-                    continue;
-                }
+            ExtractImageAssets(context, html, localBasePath, downloadUrls);
+            ExtractHeadAssets(context, html, localBasePath, downloadUrls);
+            ExtractBackgroundImages(context, html, localBasePath, downloadUrls);
 
-                if (!string.IsNullOrWhiteSpace(image.SourceSet))
-                {
-                    var (sourceSet, downloads) = ProcessSourceSet(image.SourceSet, localBasePath, context);
-                    image.SourceSet = sourceSet;
-                    if (downloads.Any())
-                    {
-                        downloadUrls.AddRange(downloads);
-                    }
-                }
-                
-                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
+            return input.Clone(
+                new[] { new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls.ToArray()) },
+                context.GetContentProvider(
+                    html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
+                    MediaTypes.Html)).Yield();
+        }
 
-                context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
-
-                // update the content
-                image.Source = context.GetLink(localPath);
-
-                // add the url for downloading
-                downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
-            }
-
+        private void ExtractHeadAssets(IExecutionContext context, IHtmlDocument html, NormalizedPath localBasePath, List<KontentImageDownload> downloadUrls)
+        {
             foreach (var meta in html.Head.Children.Where(IsImageMetaTag))
             {
                 var imageSource = meta.GetAttribute(AngleSharp.Dom.AttributeNames.Content);
@@ -121,12 +107,73 @@ namespace Kontent.Statiq
                 // add the url for downloading
                 downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
             }
+        }
 
-            return input.Clone(
-                new[] { new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls.ToArray()) },
-                context.GetContentProvider(
-                    html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
-                    MediaTypes.Html)).Yield();
+        private void ExtractImageAssets(IExecutionContext context, IHtmlDocument html, NormalizedPath localBasePath, List<KontentImageDownload> downloadUrls)
+        {
+            foreach (var image in html.Images)
+            {
+                var imageSource = image.Source;
+                if (SkipImage(imageSource))
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(image.SourceSet))
+                {
+                    var (sourceSet, downloads) = ProcessSourceSet(image.SourceSet, localBasePath, context);
+                    image.SourceSet = sourceSet;
+                    if (downloads.Any())
+                    {
+                        downloadUrls.AddRange(downloads);
+                    }
+                }
+
+                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
+
+                context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
+
+                // update the content
+                image.Source = context.GetLink(localPath);
+
+                // add the url for downloading
+                downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
+            }
+        }
+        
+        private void ExtractBackgroundImages(IExecutionContext context, IHtmlDocument html, NormalizedPath localBasePath, List<KontentImageDownload> downloadUrls)
+        {
+            Regex urlParser = new Regex(@"url\('?(?<url>[^'\""\)]+)'?\)");
+            
+            string ReplaceUrls(Match match)
+            {
+                var url = match.Groups["url"].Value;
+                if (SkipImage(url))
+                {
+                    return match.Value;
+                }
+
+                var localPath = KontentAssetHelper.GetLocalFileName(url, localBasePath);
+
+                context.LogDebug("Replacing background image {0} => {1}", url, localPath);
+
+                // update the content
+                var newUrl = context.GetLink(localPath, true);
+                // add the url for downloading
+                downloadUrls.Add(new KontentImageDownload(url, localPath));
+
+                var start = match.Groups["url"].Index - match.Index;
+                var end = match.Groups["url"].Index + url.Length - match.Index;
+
+                return match.Value.Substring(0, start) + newUrl + match.Value.Substring(end);
+            }
+            
+            foreach (var element in html.All.OfType<Element>().Where(e => e.GetAttribute("style")?.Contains("background", StringComparison.OrdinalIgnoreCase) ?? false))
+            {
+                var inlineStyles = element.GetAttribute("style");
+                var updatedStyles = urlParser.Replace(inlineStyles, ReplaceUrls);
+                element.SetAttribute("style", updatedStyles);
+            }
         }
 
         private static bool IsImageMetaTag(IElement element)

@@ -101,5 +101,34 @@ namespace Kontent.Statiq.Tests
 
             outputDoc.Content.Should().Contain($"content=\"{localUrl}\"");
         }
+        
+        [Theory,
+         InlineData("<div style=\"background-image:url('https://the.cms/images/image1.jpg')\">", "", "background-image:url('/assets/img/image1.jpg')"),
+         InlineData("<div style=\"background:url('https://the.cms/images/image1.jpg')\">", "", "url('/assets/img/image1.jpg')"),
+         InlineData("<div style=\"background: no-repeat center/80% url('https://the.cms/images/image1.jpg')\">", "", "background: no-repeat center/80% url('/assets/img/image1.jpg')"),
+         InlineData("<div style=\"background-image: url('../dont-replace-me.jpg'), url('https://the.cms/media/examples/lizard.png')\">", "", "background-image: url('../dont-replace-me.jpg'), url('/assets/img/lizard.png')"),
+         InlineData("<div style=\"background-image:url(https://the.cms/images/image1.jpg)\">", "test.alanta.nl", "https://test.alanta.nl/assets/img/image1.jpg")
+        ]
+        public async Task It_should_replace_backgroundimage_url_with_local_path(string tag, string host, string localUrl)
+        {
+            // Given 
+            string content = $"<html><body>{tag}</body></html>";
+
+            var document = new TestDocument(content);
+
+            var context = new TestExecutionContext();
+            context.Settings[Keys.Host] = host;
+            context.Settings[Keys.LinksUseHttps] = true;
+
+            // When
+            var assetParser = new KontentImageProcessor().WithLocalPath("/assets/img");
+            var output = await ExecuteAsync(new[] { document }, context, assetParser);
+
+            // Then
+            output.Length.Should().Be(1);
+            var outputDoc = output[0];
+
+            outputDoc.Content.Should().Contain(localUrl);
+        }
     }
 }

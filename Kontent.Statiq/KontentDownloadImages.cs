@@ -11,7 +11,7 @@ namespace Kontent.Statiq
     /// Downloads all images found in input documents processed with <see cref="KontentImageProcessor"/>
     /// The downloaded assets can then be processed with modules such as <see cref="WriteFiles"/>.
     /// </summary>
-    public class KontentDownloadImages : ReadWeb
+    public class KontentDownloadImages : Module
     {
         /// <inheritdoc />
         protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
@@ -22,9 +22,9 @@ namespace Kontent.Statiq
 
             var assetUrls = assets.DistinctBy(a => a.LocalPath).Select(a => a.OriginalUrl).ToArray();
 
-            WithUris(assetUrls.ToArray());
-
-            var downloads = await base.ExecuteContextAsync(context);
+            var childModule = new ReadWeb(assetUrls);
+            var downloads = await childModule.ExecuteAsync(context);
+            
             var downloadsWithDestination = new List<IDocument>();
 
             foreach (var download in downloads)

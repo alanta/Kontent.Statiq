@@ -428,7 +428,7 @@ For most cases there is a helper or extension to access the metadata but if you 
 
 ## Troubleshooting
 
-> There are weird object tags like this in my content: 
+#### There are weird object tags like this in my content: 
 
 ```xml
 <object type="application/kenticocloud" data-type="item" data-rel="component" data-codename="n2ef9e997_4691_0118_8777_c0ac9cee683b"></object>
@@ -436,17 +436,22 @@ For most cases there is a helper or extension to access the metadata but if you 
 
 This means that the Kontent Delivery SDK was unable to resolve the type of content included in your rich text field. Make sure you read the section on structured content and follow the configuration steps.
 
-> Links to other pages don't work
+#### Links to other pages don't work
 
 Implement and register a link resolver. See the [Kontent docs](https://github.com/Kentico/kontent-delivery-sdk-net/wiki/Resolving-Links-to-Content-Items) for more information.
 
-> Null reference while rendering Razor
+#### Null reference while rendering Razor
 
 Make sure all your classes are in a namespace.
 
-> A _Bad request_ occurs while loading data from Kontent
+#### A _Bad request_ occurs while loading data from Kontent
 
 If you have a lot of content items, use the items-feed by calling `.WithItemsFeed()` method on the Kontent module.
+
+#### Why is this project Beta?
+
+Mostly because Statiq itself is still beta and release packages should not rely on beta dependencies. As soon as Statiq moves to 1.0, so will this project.
+The Kontent Statiq is being used in production projects.
 
 ## How do I build this repo?
 
@@ -465,7 +470,9 @@ You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio
 
 
 ## Blog posts, videos & docs
-* [Jamstack and .NET - friends or enemies?](https://www.youtube.com/watch?v=Y_yMveuTOTA) Ondrabus on YouTube, 5 nov 2020
+* [Building fast Jamstack sites on .NET @ CloudSummit 2021](https://www.youtube.com/watch?v=MJnVsAmSZB0&t=12402s) Ondrej Polesny on YouTube, 21 sept 2021
+* [Jamstack on .NET : how I built this site](https://alanta.nl/posts/2021/05/how-i-built-this-site) Marnix van Valen, 17 may 2021
+* [Jamstack and .NET - friends or enemies?](https://www.youtube.com/watch?v=Y_yMveuTOTA) Ondrej Polesny on YouTube, 5 nov 2020
 * [Statiq Starter Kontent Lumen](https://jamstackthemes.dev/theme/statiq-starter-kontent-lumen/) sources on [Github](https://github.com/petrsvihlik/statiq-starter-kontent-lumen), 20 oct 2020
 * [On .NET Live - Generating static web applications with Statiq](https://www.youtube.com/watch?v=43oQTRZqK9g) on Youtube, 6 aug. 2020
 * [Static sites with Kentico Cloud, Statiq and Netlify](https://www.kenticotricks.com/blog/static-sites-with-kentico-cloud) Kristian Bortnik, 31 jan 2018

@@ -12,9 +12,9 @@
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="RichardSzalay.MockHttp" Version="6.0.0" />
-    <PackageReference Include="Statiq.Core" Version="1.0.0-beta.38" />
-    <PackageReference Include="Statiq.Razor" Version="1.0.0-beta.38" />
-    <PackageReference Include="Statiq.Testing" Version="1.0.0-beta.38" />
+    <PackageReference Include="Statiq.Core" Version="1.0.0-beta.48" />
+    <PackageReference Include="Statiq.Razor" Version="1.0.0-beta.48" />
+    <PackageReference Include="Statiq.Testing" Version="1.0.0-beta.48" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
@@ -28,18 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kontent.Statiq\Kontent.Statiq.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="input\Article.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="input\_Layout.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="input\_ViewStart.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

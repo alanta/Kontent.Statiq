@@ -4,9 +4,9 @@ using Kentico.Kontent.Delivery.Abstractions;
 using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
 using Statiq.Common;
-using Statiq.Core;
+using Statiq.Testing;
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -37,15 +37,9 @@ namespace Kontent.Statiq.Tests
             var sut = new Kontent<Article>(deliveryClient);
 
             // Act
-            var engine = SetupExecution( sut, docs =>
-            {
-                docs.Should().NotBeNull();
-                return Task.CompletedTask;
-            });
-            await engine.ExecuteAsync();
-
+            var outputs = await Execute(sut);
+            
             // Assert
-            var outputs = engine.Outputs.FromPipeline("test");
             outputs.Should().HaveCount(1);
             var metadata = outputs.First();
 
@@ -69,16 +63,14 @@ namespace Kontent.Statiq.Tests
                 .WithContent(item => item.Title);
 
             // Act
-            var engine = SetupExecution(sut, 
-            
+            var output = await Execute(sut);
+
             // Assert    
-                async docs => (await docs.FirstOrDefault().GetContentStringAsync()).Should().Contain("Coffee")
-                );
-            await engine.ExecuteAsync();
+            (await output.FirstOrDefault().GetContentStringAsync()).Should().Contain("Coffee");
         }
 
         [Fact]
-        public async Task It_should_correctly_set_the_default_content_from_richtext()
+        public async Task It_should_correctly_set_the_default_content_from_rich_text()
         {
             // Arrange
             var body = new TestRichTextContent();
@@ -92,24 +84,17 @@ namespace Kontent.Statiq.Tests
                 .WithContent(item => item.BodyCopy.ToString() ?? "" );
 
             // Act
-            var engine = SetupExecution(sut,
+            var output = await Execute(sut);
 
-                // Assert    
-                async docs => (await docs.FirstOrDefault().GetContentStringAsync()).Should().Contain("Coffee")
-            );
-            await engine.ExecuteAsync();
+            // Assert
+            (await output.FirstOrDefault().GetContentStringAsync()).Should().Contain("Coffee");
+
         }
 
-        private static Engine SetupExecution<TContent>(Kontent<TContent> kontentModule, Func<IReadOnlyList<IDocument>, Task> test ) where TContent : class
+        private static Task<ImmutableArray<IDocument>> Execute<TContent>(Kontent<TContent> kontentModule ) where TContent : class
         {
-            var engine = new Engine();
-            var pipeline = new Pipeline()
-            {
-                InputModules = { kontentModule, new TestModule(test) }
-            };
-
-            engine.Pipelines.Add("test", pipeline);
-            return engine;
+            TestExecutionContext context = new TestExecutionContext();
+            return context.ExecuteModulesAsync(new IModule[]{ kontentModule });
         }
     }
 }

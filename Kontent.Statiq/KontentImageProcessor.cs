@@ -163,7 +163,7 @@ namespace Kontent.Statiq
                 var start = match.Groups["url"].Index - match.Index;
                 var end = match.Groups["url"].Index + url.Length - match.Index;
 
-                return match.Value.Substring(0, start) + newUrl + match.Value.Substring(end);
+                return match.Value[..start] + newUrl + match.Value[end..];
             }
             
             foreach (var element in html.All.OfType<Element>().Where(e => e.GetAttribute("style")?.Contains("background", StringComparison.OrdinalIgnoreCase) ?? false))

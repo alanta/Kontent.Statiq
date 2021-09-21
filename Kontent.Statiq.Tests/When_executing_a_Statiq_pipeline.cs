@@ -48,7 +48,7 @@ namespace Kontent.Statiq.Tests
             metadata.Get<string>(KontentKeys.System.Language).Should().Be("en-US");
             metadata.Get<string>(KontentKeys.System.CodeName).Should().Be("coffee_beverages_explained");
             metadata.Get<string>(KontentKeys.System.Name).Should().Be("Coffee Beverages Explained");
-            metadata.Get<DateTime>(KontentKeys.System.LastModified).Should().BeCloseTo(new DateTime(2019, 09, 18, 10, 58, 38, 917));
+            metadata.Get<DateTime>(KontentKeys.System.LastModified).Should().BeCloseTo(new DateTime(2019, 09, 18, 10, 58, 38, 917), TimeSpan.FromMilliseconds(100));
         }
 
         [Fact]
@@ -73,9 +73,8 @@ namespace Kontent.Statiq.Tests
         public async Task It_should_correctly_set_the_default_content_from_rich_text()
         {
             // Arrange
-            var body = new TestRichTextContent();
-            body.Add("Coffee");
-            
+            var body = new TestRichTextContent {"Coffee"};
+
             var content = new Article { BodyCopy = body };
 
             var deliveryClient = A.Fake<IDeliveryClient>().WithFakeContent(content);

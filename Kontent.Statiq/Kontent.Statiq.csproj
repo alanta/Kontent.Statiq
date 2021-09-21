@@ -29,7 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Kentico.Kontent.Delivery" Version="15.0.0" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.17.0.26580">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.29.0.36737">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

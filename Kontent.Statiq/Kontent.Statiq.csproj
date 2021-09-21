@@ -28,8 +28,7 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Kontent.Delivery" Version="14.2.1" />
-    <PackageReference Include="Kentico.Kontent.ImageTransformation" Version="14.2.1" />
+    <PackageReference Include="Kentico.Kontent.Delivery" Version="15.0.0" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="8.17.0.26580">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

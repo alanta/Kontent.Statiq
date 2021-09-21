@@ -472,6 +472,8 @@ You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio
 ## Blog posts, videos & docs
 * [Building fast Jamstack sites on .NET @ CloudSummit 2021](https://www.youtube.com/watch?v=MJnVsAmSZB0&t=12402s) Ondrej Polesny on YouTube, 21 sept 2021
 * [Jamstack on .NET : how I built this site](https://alanta.nl/posts/2021/05/how-i-built-this-site) Marnix van Valen, 17 may 2021
+* [Returning to .NET](https://www.mattnield.co.uk/blog/returning-to-net/) Matt Nield, 11 mar 2021
+* [JAMStack on .NET](https://jamstackon.net/) microsite by Kentico
 * [Jamstack and .NET - friends or enemies?](https://www.youtube.com/watch?v=Y_yMveuTOTA) Ondrej Polesny on YouTube, 5 nov 2020
 * [Statiq Starter Kontent Lumen](https://jamstackthemes.dev/theme/statiq-starter-kontent-lumen/) sources on [Github](https://github.com/petrsvihlik/statiq-starter-kontent-lumen), 20 oct 2020
 * [On .NET Live - Generating static web applications with Statiq](https://www.youtube.com/watch?v=43oQTRZqK9g) on Youtube, 6 aug. 2020

@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Statiq.Common;
 using Statiq.Core;
+using Statiq.Razor;
 using Statiq.Testing;
 using System;
 using System.Collections.Generic;
@@ -259,7 +260,11 @@ namespace Kontent.Statiq.Tests
 
             var engine = new Engine(
                 new ApplicationState(Array.Empty<string>(), "", ""),
-                new TestServiceProvider(cfg => cfg.AddSingleton<ILoggerFactory>(new XUnitLoggerFactory(_output))));
+                new TestServiceProvider(cfg =>
+                {
+                    cfg.AddRazor();
+                    cfg.AddSingleton<ILoggerFactory>(new XUnitLoggerFactory(_output));
+                }));
             
             engine.Pipelines.Add("Articles", articlePipeline);
             engine.Pipelines.Add("Menu", menuPipeline);
@@ -303,7 +308,9 @@ namespace Kontent.Statiq.Tests
 
         private static Task<IPipelineOutputs> Execute(Pipeline pipeline)
         {
-            var engine = new Engine();
+            var engine = new Engine(new ApplicationState(Array.Empty<string>(), "", ""),
+                new TestServiceProvider(cfg => cfg.AddRazor()));
+            
             engine.Pipelines.Add("test", pipeline);
             return engine.ExecuteAsync();
         }

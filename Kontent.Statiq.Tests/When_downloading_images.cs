@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Statiq.Common;
 using Statiq.Core;
+using Statiq.Testing;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -22,20 +24,17 @@ namespace Kontent.Statiq.Tests
             };
             
             // Act
-            var pipeline = new Pipeline
+            var pipeline = new IModule[]
             {
-                InputModules =
+                new ReplaceDocuments(Config.FromContext(ctx =>
                 {
-                    new ReplaceDocuments( Config.FromContext(ctx =>
+                    var metadata = new[]
                     {
-                        var metadata = new[]
-                        {
-                            new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls)
-                        };
-                        return ctx.CreateDocument(metadata).Yield();
-                    })),
-                    new KontentDownloadImages()
-                }
+                        new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls)
+                    };
+                    return ctx.CreateDocument(metadata).Yield();
+                })),
+                new KontentDownloadImages()
             };
 
             var results = await Execute(pipeline);
@@ -45,11 +44,10 @@ namespace Kontent.Statiq.Tests
             results.First().Destination.Should().Be("img/icon.png");
         }
         
-        private static Task<IPipelineOutputs> Execute(Pipeline pipeline)
+        private static Task<ImmutableArray<IDocument>> Execute(params IModule[] modules)
         {
-            var engine = new Engine();
-            engine.Pipelines.Add("test", pipeline);
-            return engine.ExecuteAsync();
+            TestExecutionContext context = new TestExecutionContext();
+            return context.ExecuteModulesAsync(modules);
         }
     }
 }

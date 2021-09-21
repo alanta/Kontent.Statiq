@@ -5,7 +5,8 @@ using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
 using Statiq.Common;
 using Statiq.Core;
-using System.Collections.Generic;
+using Statiq.Testing;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -116,19 +117,10 @@ namespace Kontent.Statiq.Tests
             return new Cafe { System = new TestContentItemSystemAttributes{ Name = name }};
         }
 
-        private static async Task<IReadOnlyList<IDocument>> Execute<TContent>(Kontent<TContent> kontentModule, IModule[] processModules) where TContent : class
+        private static async Task<ImmutableArray<IDocument>> Execute<TContent>(Kontent<TContent> kontentModule, IModule[] processModules) where TContent : class
         {
-            var engine = new Engine();
-            var pipeline = new Pipeline()
-            {
-                InputModules = { kontentModule },
-            };
-            pipeline.ProcessModules.AddRange(processModules);
-
-            engine.Pipelines.Add("test", pipeline);
-            var result = await engine.ExecuteAsync();
-
-            return result.FromPipeline("Test");
+            TestExecutionContext context = new TestExecutionContext();
+            return await context.ExecuteModulesAsync(new IModule[]{ kontentModule }.Concat(processModules));
         }
     }
 }

@@ -19,6 +19,7 @@ namespace Kontent.Statiq
         internal static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
             HashSet<TKey> seenKeys = new HashSet<TKey>();
+#pragma warning disable S3267 // Loops should be simplified with "LINQ" expressions
             foreach (TSource element in source)
             {
                 if (seenKeys.Add(keySelector(element)))
@@ -26,6 +27,7 @@ namespace Kontent.Statiq
                     yield return element;
                 }
             }
+#pragma warning restore S3267 // Loops should be simplified with "LINQ" expressions
         }
     }
 }

@@ -88,6 +88,9 @@ namespace Kontent.Statiq
 
         private void ExtractHeadAssets(IExecutionContext context, IHtmlDocument html, NormalizedPath localBasePath, List<KontentImageDownload> downloadUrls)
         {
+            if( html.Head == null )
+                return;
+
             foreach (var meta in html.Head.Children.Where(IsImageMetaTag))
             {
                 var imageSource = meta.GetAttribute(AngleSharp.Dom.AttributeNames.Content);
@@ -96,14 +99,14 @@ namespace Kontent.Statiq
                     continue;
                 }
 
-                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
+                var localPath = KontentAssetHelper.GetLocalFileName(imageSource!, localBasePath);
 
                 context.LogDebug("Replacing metadata image {source} => {destination}", imageSource, localPath);
 
                 meta.SetAttribute(AngleSharp.Dom.AttributeNames.Content, context.GetLink(localPath, true));
 
                 // add the url for downloading
-                downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
+                downloadUrls.Add(new KontentImageDownload(imageSource!, localPath));
             }
         }
 
@@ -127,7 +130,7 @@ namespace Kontent.Statiq
                     }
                 }
 
-                var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
+                var localPath = KontentAssetHelper.GetLocalFileName(imageSource!, localBasePath);
 
                 context.LogDebug("Replacing image {source} => {destination}", image.Source, localPath);
 
@@ -135,7 +138,7 @@ namespace Kontent.Statiq
                 image.Source = context.GetLink(localPath);
 
                 // add the url for downloading
-                downloadUrls.Add(new KontentImageDownload(imageSource, localPath));
+                downloadUrls.Add(new KontentImageDownload(imageSource!, localPath));
             }
         }
         
@@ -168,7 +171,7 @@ namespace Kontent.Statiq
             
             foreach (var element in html.All.OfType<Element>().Where(e => e.GetAttribute("style")?.Contains("background", StringComparison.OrdinalIgnoreCase) ?? false))
             {
-                var inlineStyles = element.GetAttribute("style");
+                var inlineStyles = element.GetAttribute("style")!;
                 var updatedStyles = urlParser.Replace(inlineStyles, ReplaceUrls);
                 element.SetAttribute("style", updatedStyles);
             }
@@ -181,9 +184,9 @@ namespace Kontent.Statiq
                    && ( element.GetAttribute(AttributeNames.Content)?.StartsWith("http", StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
-        private bool SkipImage(string uri)
+        private bool SkipImage(string? uri)
         {
-            return (!IsRemoteUrl(uri) || !(_urlFilter?.Invoke(uri) ?? true));
+            return string.IsNullOrEmpty(uri) || (!IsRemoteUrl(uri) || !(_urlFilter?.Invoke(uri) ?? true));
         }
 
         private (string, KontentImageDownload[]) ProcessSourceSet(string sourceSet, NormalizedPath localBasePath, IExecutionContext context)

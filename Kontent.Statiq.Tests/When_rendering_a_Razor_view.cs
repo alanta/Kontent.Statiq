@@ -69,7 +69,7 @@ LAYOUT!
             content.Should().Contain("<h3>Test</h3>", "It should pickup data from the model");
         }
 
-        private TestExecutionContext GetExecutionContext()
+        private static TestExecutionContext GetExecutionContext()
         {
             // see https://github.com/statiqdev/Statiq.Framework/blob/main/tests/extensions/Statiq.Razor.Tests/RenderRazorFixture.cs
             TestExecutionContext context = new TestExecutionContext()
@@ -83,7 +83,7 @@ LAYOUT!
             return context;
         }
 
-        private TestFileSystem GetFileSystem() => new TestFileSystem()
+        private static TestFileSystem GetFileSystem() => new TestFileSystem()
         {
             RootPath = NormalizedPath.AbsoluteRoot,
             InputPaths = new PathCollection("input")

@@ -1,7 +1,7 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.Delivery.Urls.QueryParameters.Filters;
+using Kentico.Kontent.Urls.Delivery.QueryParameters.Filters;
 using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +51,7 @@ namespace Kontent.Statiq.Tests
             // Assert
             results.Should().HaveCount(1);
             results.First().GetChildren().Should().HaveCount(2);
-            results.First().GetChildren().First().GetChildren().Should().HaveCount(3);
+            results.First().GetChildren()[0].GetChildren().Should().HaveCount(3);
         }
 
         [Fact]
@@ -287,7 +287,7 @@ namespace Kontent.Statiq.Tests
         }
 
 
-        private ITaxonomyGroup SetupTaxonomyGroup(string name, params string[] terms)
+        private static ITaxonomyGroup SetupTaxonomyGroup(string name, params string[] terms)
         {
             var group = new TestTaxonomyGroup(new TestTaxonomyGroupSystemAttributes
             {
@@ -300,7 +300,7 @@ namespace Kontent.Statiq.Tests
             return group;
         }
 
-        private IList<ITaxonomyTermDetails> CreateTaxonomyTerms(params string[] terms)
+        private static IList<ITaxonomyTermDetails> CreateTaxonomyTerms(params string[] terms)
         {
             return terms.Select(t => new TestTaxonomyTermDetails {Codename = t.ToLower(), Name = t})
                 .Cast<ITaxonomyTermDetails>().ToList();

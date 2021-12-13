@@ -98,7 +98,7 @@ namespace Kontent.Statiq
 
                 var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
 
-                context.LogDebug("Replacing metadata image {0} => {1}", imageSource, localPath);
+                context.LogDebug("Replacing metadata image {source} => {destination}", imageSource, localPath);
 
                 meta.SetAttribute(AngleSharp.Dom.AttributeNames.Content, context.GetLink(localPath, true));
 
@@ -129,7 +129,7 @@ namespace Kontent.Statiq
 
                 var localPath = KontentAssetHelper.GetLocalFileName(imageSource, localBasePath);
 
-                context.LogDebug("Replacing image {0} => {1}", image.Source, localPath);
+                context.LogDebug("Replacing image {source} => {destination}", image.Source, localPath);
 
                 // update the content
                 image.Source = context.GetLink(localPath);
@@ -153,7 +153,7 @@ namespace Kontent.Statiq
 
                 var localPath = KontentAssetHelper.GetLocalFileName(url, localBasePath);
 
-                context.LogDebug("Replacing background image {0} => {1}", url, localPath);
+                context.LogDebug("Replacing background image {source} => {destination}", url, localPath);
 
                 // update the content
                 var newUrl = context.GetLink(localPath, true);
@@ -203,7 +203,7 @@ namespace Kontent.Statiq
                 else
                 {
                     var localPath = KontentAssetHelper.GetLocalFileName(url, localBasePath);
-                    context.LogDebug("Replacing srcset image {0} => {1}", url, localPath);
+                    context.LogDebug("Replacing srcset image {url} => {localPath}", url, localPath);
                     newSourceSet.Add($"{localPath} {size}".Trim());
                     downloads.Add(new KontentImageDownload(url, localPath));
                 }
@@ -236,7 +236,7 @@ namespace Kontent.Statiq
             }
             catch (Exception ex)
             {
-                context.LogWarning("Exception while parsing HTML for {0}: {1}", document.ToSafeDisplayString(), ex.Message);
+                context.LogWarning("Exception while parsing HTML for {html}: {message}", document.ToSafeDisplayString(), ex.Message);
             }
             return null;
         }

@@ -1,4 +1,6 @@
-﻿using Statiq.Common;
+﻿using FluentAssertions;
+using Shouldly;
+using Statiq.Common;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -18,11 +20,16 @@ namespace Kontent.Statiq.Tests
             };
 
             // Act
-            var assetUrls = assets.DistinctBy(a => a.LocalPath);
+            var assetUrls = assets.DistinctBy(a => a.LocalPath).ToArray();
 
             // Assert
-            Assert.Equal(2, assetUrls.Count());
-            Assert.NotEqual(assetUrls.FirstOrDefault().LocalPath, assetUrls.LastOrDefault().LocalPath);
+            assetUrls.Should().HaveCount(2);
+            assetUrls.Select( i => i.LocalPath ).Should()
+              .BeEquivalentTo(
+                new[]{ 
+                    new NormalizedPath("/a/"), 
+                    new NormalizedPath("/b/") 
+                    });
         }
     }
 }

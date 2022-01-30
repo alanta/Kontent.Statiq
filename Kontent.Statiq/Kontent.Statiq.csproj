@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
-    <Authors>Marnix van Valen, Kristian Bortnik</Authors>
+    <Authors>Marnix van Valen</Authors>
     <Company>Kontent.Statiq</Company>
     <Description>Kentico Kontent module for Statiq. Fetch content and assets from Kontent headless CMS.</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Copyright>Kristian Bortnik, Marnix van Valen 2018-2020</Copyright>
+    <Copyright>Marnix van Valen 2018-2022</Copyright>
     <PackageProjectUrl>https://github.com/alanta/Kontent.Statiq</PackageProjectUrl>
     <RepositoryUrl>https://github.com/alanta/Kontent.Statiq</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
-    <PackageTags>kontent statiq</PackageTags>
+    <PackageTags>kontent; statiq; jamstack; static site;</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

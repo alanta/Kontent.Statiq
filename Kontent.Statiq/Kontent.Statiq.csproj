@@ -18,6 +18,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)'=='Release'">
     <AssemblyAttribute Include="Kentico.Kontent.Delivery.DeliverySourceTrackingHeader" />
@@ -28,8 +29,8 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Kontent.Delivery" Version="16.0.0-beta5" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.32.0.39516">
+    <PackageReference Include="Kentico.Kontent.Delivery" Version="16.0.0" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.38.0.46746">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -45,6 +46,10 @@
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>False</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 

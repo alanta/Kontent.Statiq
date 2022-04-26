@@ -21,7 +21,7 @@ This is a quick guide to get some content from Kontent and render it to HTML. Yo
 * Follow the [getting started](https://statiq.dev/framework/) steps for Statiq.Framework, then come back here to set up a [pipeline](https://statiq.dev/framework/pipelines/)
 * Add `Kontent.Statiq` to the project:
 
-```dotnet add package Kontent.Statiq --version 1.0.0-*```
+```dotnet add package Kontent.Statiq --version 2.0.0-*```
 
 ### Generate the content models
 
@@ -241,7 +241,7 @@ For example:
 <img src="@Model.TeaserImage.First().Url?w=350&h=350&fit=crop"/>
 ```
 
-In this example `TeaserImage` is an Asset field on a strong-typed model. We pick the first asset. You can set the image transformation parameters by hand or use the `ImageUrl` extension method to get access to the [ImageUrlBuilder](https://github.com/Kentico/kontent-delivery-sdk-net/blob/master/Kentico.Kontent.ImageTransformation/ImageUrlBuilder.cs) from the Kontent .NET SDK.
+In this example `TeaserImage` is an Asset field on a strong-typed model. We pick the first asset. You can set the image transformation parameters by hand or use the `ImageUrl` extension method to get access to the [ImageUrlBuilder](https://github.com/Kentico/kontent-delivery-sdk-net/blob/master/Kentico.Kontent.Urls/ImageTransformation/ImageUrlBuilder.cs) from the Kontent .NET SDK.
 
 The `ImageUrlBuilder` provides a fluent API to specify image manipulations including resizing and a focus point. Finally, the `Url` property returns the full URL.
 

@@ -472,6 +472,7 @@ You'll need a .NET 6 development setup: Windows, Mac, Linux with VisualStudio, V
 
 
 ## Blog posts, videos & docs
+* [Why Kontent and Jamstack are primed for .NET and the Enterprise @ Kontent Horizons 2021](https://www.youtube.com/watch?v=khkF8-eEdjI&t=1083s) Brian McKeiver, 25 nov 2021
 * [Building fast Jamstack sites on .NET @ CloudSummit 2021](https://www.youtube.com/watch?v=MJnVsAmSZB0&t=12402s) Ondrej Polesny on YouTube, 21 sept 2021
 * [Jamstack on .NET : how I built this site](https://alanta.nl/posts/2021/05/how-i-built-this-site) Marnix van Valen, 17 may 2021
 * [Returning to .NET](https://www.mattnield.co.uk/blog/returning-to-net/) Matt Nield, 11 mar 2021

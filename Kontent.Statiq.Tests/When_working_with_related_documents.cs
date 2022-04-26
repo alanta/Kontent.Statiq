@@ -6,6 +6,7 @@ using Kontent.Statiq.Tests.Tools;
 using Statiq.Common;
 using Statiq.Core;
 using Statiq.Testing;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -72,7 +73,7 @@ namespace Kontent.Statiq.Tests
 
             var cafes = docs.FirstOrDefault().GetChildren("cafes");
             cafes.Should().HaveCount(1);
-            cafes.First()[KontentKeys.System.Name].Should().Be("Ok Café");
+            cafes[0][KontentKeys.System.Name].Should().Be("Ok Café");
         }
 
         [Fact]
@@ -82,7 +83,7 @@ namespace Kontent.Statiq.Tests
             var home = new Home
             {
                 Articles = null!,
-                Cafes = new Cafe[0]
+                Cafes = Array.Empty<Cafe>()
             };
 
             var deliveryClient = A.Fake<IDeliveryClient>().WithFakeContent(home);

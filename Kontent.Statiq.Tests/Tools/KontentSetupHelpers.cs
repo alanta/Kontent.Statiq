@@ -22,7 +22,7 @@ namespace Kontent.Statiq.Tests.Tools
             var response = A.Fake<IDeliveryItemsFeed<TContent>>();
             var moreData = true;
             A.CallTo(() => response.HasMoreResults).ReturnsLazily( _ => moreData );
-            A.CallTo(() => response.FetchNextBatchAsync()).ReturnsLazily(_ =>
+            A.CallTo(() => response.FetchNextBatchAsync(A<string>.Ignored)).ReturnsLazily(_ =>
             {
                 moreData = false; // return a single batch
                 var data = A.Fake<IDeliveryItemsFeedResponse<TContent>>();

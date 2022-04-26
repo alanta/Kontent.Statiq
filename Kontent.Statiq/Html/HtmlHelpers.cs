@@ -1,5 +1,5 @@
 ﻿using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.ImageTransformation;
+using Kentico.Kontent.Urls.ImageTransformation;
 using Statiq.Common;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,7 @@ namespace Kontent.Statiq.Html
         /// <param name="document">The Statiq document.</param>
         /// <param name="codename">The codename of the field that holds the asset.</param>
         /// <returns>The asset url or an empty string if not available.</returns>
-        public static string GetFirstAssetUrl(this IDocument document, string codename)
+        public static string GetFirstAssetUrl(this IDocument? document, string codename)
         {
             if (document == null)
             {

@@ -5,6 +5,8 @@
 
 Module to retrieve content from [Kentico Kontent](https://kontent.ai) for building static websites with [Statiq](https://Statiq.dev).
 
+Works with .NET Core 3.1 and .NET 6.
+
 ## Getting started
 
 To get started, you can follow the tutorial below or check out the [starter site](https://github.com/petrsvihlik/statiq-starter-kontent-lumen). It'll give you a nice impression of what you can do with Kontent and Statiq. 
@@ -455,7 +457,7 @@ The Kontent Statiq is being used in production projects.
 
 ## How do I build this repo?
 
-You'll need a .NET Core development setup: Windows, Mac, Linux with VisualStudio, VS Code or Rider.
+You'll need a .NET 6 development setup: Windows, Mac, Linux with VisualStudio, VS Code or Rider.
 
 ## Contribution guidelines
 

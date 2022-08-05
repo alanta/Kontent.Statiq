@@ -1,5 +1,5 @@
 ﻿using FakeItEasy;
-using Kentico.Kontent.Delivery.Abstractions;
+using Kontent.Ai.Delivery.Abstractions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

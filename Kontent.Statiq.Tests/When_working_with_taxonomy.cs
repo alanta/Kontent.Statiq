@@ -1,7 +1,7 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
-using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.Urls.Delivery.QueryParameters.Filters;
+using Kontent.Ai.Delivery.Abstractions;
+using Kontent.Ai.Urls.Delivery.QueryParameters.Filters;
 using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
 using Microsoft.Extensions.DependencyInjection;

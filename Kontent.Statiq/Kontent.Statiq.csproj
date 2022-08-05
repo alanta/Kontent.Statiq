@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <Authors>Marnix van Valen</Authors>
     <Company>Kontent.Statiq</Company>
     <Description>Kentico Kontent module for Statiq. Fetch content and assets from Kontent headless CMS.</Description>
@@ -21,7 +21,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <AssemblyAttribute Include="Kentico.Kontent.Delivery.DeliverySourceTrackingHeader" />
+    <AssemblyAttribute Include="Kontent.Ai.Delivery.DeliverySourceTrackingHeader" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -29,7 +29,7 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kentico.Kontent.Delivery" Version="16.0.0" />
+    <PackageReference Include="Kontent.Ai.Delivery" Version="17.0.0" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="8.38.0.46746">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

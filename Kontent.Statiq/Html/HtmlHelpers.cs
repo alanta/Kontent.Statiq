@@ -1,5 +1,5 @@
-﻿using Kentico.Kontent.Delivery.Abstractions;
-using Kentico.Kontent.Urls.ImageTransformation;
+﻿using Kontent.Ai.Delivery.Abstractions;
+using Kontent.Ai.Urls.ImageTransformation;
 using Statiq.Common;
 using System.Collections.Generic;
 using System.Linq;

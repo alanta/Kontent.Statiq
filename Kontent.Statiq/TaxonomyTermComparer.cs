@@ -1,4 +1,4 @@
-﻿using Kentico.Kontent.Delivery.Abstractions;
+﻿using Kontent.Ai.Delivery.Abstractions;
 using System.Collections.Generic;
 
 namespace Kontent.Statiq

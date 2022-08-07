@@ -1,6 +1,6 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
-using Kentico.Kontent.Delivery.Abstractions;
+using Kontent.Ai.Delivery.Abstractions;
 using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
 using Statiq.Common;

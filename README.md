@@ -5,7 +5,7 @@
 
 Module to retrieve content from [Kentico Kontent](https://kontent.ai) for building static websites with [Statiq](https://Statiq.dev).
 
-Works with .NET Core 3.1 and .NET 6.
+Works with .NET 6.
 
 ## Getting started
 

@@ -26,8 +26,8 @@ public static class LoggerTestExtensions
     private static (bool found, LogLevel? level, string? message) VerifyLog(this ILogger logger, string message)
     {
         var call = Fake.GetCalls(logger)
-            .FirstOrDefault(call => call.Arguments[2].ToString().Contains(message, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(call => call.Method.Name == "Log" && call.Arguments.Count > 2 && ( call.Arguments[2]?.ToString()?.Contains(message, StringComparison.OrdinalIgnoreCase) ?? false ));
 
-        return (call != null, (LogLevel?)call?.Arguments[0], call?.Arguments[2].ToString());
+        return (call != null, (LogLevel?)call?.Arguments[0], call?.Arguments[2]?.ToString() ?? "");
     }
 }

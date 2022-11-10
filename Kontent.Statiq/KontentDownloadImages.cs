@@ -13,12 +13,9 @@ namespace Kontent.Statiq
     /// </summary>
     public class KontentDownloadImages : Module
     {
-        Dictionary<string, CachedImage> _cached = new(StringComparer.OrdinalIgnoreCase);
-        public class CachedImage
-        {
-            public byte[] Data { get; set; }
-            public string MediaType { get; set; }
-        }
+        readonly Dictionary<string, CachedImage> _cached = new(StringComparer.OrdinalIgnoreCase);
+
+        internal record CachedImage(byte[] Data, string MediaType);
 
         /// <inheritdoc />
         protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
@@ -28,30 +25,36 @@ namespace Kontent.Statiq
                 .DistinctBy(a => a.LocalPath) // filter duplicates
                 .ToArray();
 
-            // optimize for rerendering on preview - skip files already in cache
+            // optimize for re-rendering on preview - skip files already in cache
             var newAssets = assets.Where(asset => !_cached.ContainsKey(asset.LocalPath.ToString())).ToArray();
             var downloadsWithDestination = assets.Except(newAssets).Select(asset => context.CreateDocument(
                 destination: asset.LocalPath.ToString().ToLower().TrimStart('/'),
                 context.GetContentProvider(_cached[asset.LocalPath.ToString()].Data, _cached[asset.LocalPath.ToString()].MediaType)
             )).ToList();
 
-            if (newAssets.Length == 0)
-            {
-                context.LogInformation(null, $"Skipping image download because there are no new images.");
-            }
             if (newAssets.Length != assets.Length)
             {
                 context.LogInformation(null, $"Downloading {newAssets.Length} files, skipping {assets.Length - newAssets.Length} already downloaded.");
             }
 
+            if (newAssets.Length > 0)
+            {
+                await DownloadNewAssets(context, newAssets, downloadsWithDestination);
+            }
+
+            return downloadsWithDestination;
+        }
+
+        private async Task DownloadNewAssets(IExecutionContext context, KontentImageDownload[] assets, List<IDocument> downloadsWithDestination)
+        {
             var downloads = new List<IDocument>();
 
             // Workaround for unlimited concurrency in ReadWeb. By fetching chunks of 20 images we prevent timeouts 
             // caused by flooding the Kontent Delivery API with 100s of concurrent requests.
-            foreach (var batch in newAssets.Select(a => a.OriginalUrl).Chunk(20))
+            foreach (var batch in assets.Select(a => a.OriginalUrl).Chunk(20))
             {
                 var module = new ReadWeb(batch);
-                var documents = await module!.ExecuteAsync(context);
+                var documents = await module.ExecuteAsync(context);
                 downloads.AddRange(documents);
             }
 
@@ -59,19 +62,14 @@ namespace Kontent.Statiq
             {
                 var downloadedUrl = download.Get<string>(Keys.SourceUri);
                 var asset = assets.FirstOrDefault(a => a.OriginalUrl == downloadedUrl);
-                if (asset != null)
-                {
-                    _cached[asset.LocalPath.ToString()] = new CachedImage { Data = await download.GetContentBytesAsync(), MediaType = download.ContentProvider.MediaType };
-                    downloadsWithDestination.Add(download.Clone(destination: asset.LocalPath.ToString().ToLower().TrimStart('/')));
-                }
-                else
+                if (asset == null)
                 {
                     throw new InvalidOperationException($"No asset found for url {downloadedUrl}");
                 }
+                
+                _cached[asset.LocalPath.ToString()] = new CachedImage(Data: await download.GetContentBytesAsync(), MediaType: download.ContentProvider.MediaType);
+                downloadsWithDestination.Add(download.Clone(destination: asset.LocalPath.ToString().ToLower().TrimStart('/')));
             }
-
-            return downloadsWithDestination;
         }
-
     }
 }

@@ -10,6 +10,7 @@ namespace Kontent.Statiq.Tests.Tools
         public static IDeliveryClient WithFakeContent<TContent>(this IDeliveryClient client, params TContent[] content)
         {
             var response = A.Fake<IDeliveryItemListingResponse<TContent>>();
+            A.CallTo(() => response.ApiResponse.IsSuccess).Returns(true);
             A.CallTo(() => response.Items).Returns( content );
             A.CallTo(() => client.GetItemsAsync<TContent>(A<IEnumerable<IQueryParameter>>._))
                 .Returns(response);

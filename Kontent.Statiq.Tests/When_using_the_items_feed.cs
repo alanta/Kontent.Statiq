@@ -7,7 +7,11 @@ using Statiq.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Xunit;
+using System.Linq;
+using Shouldly;
+using Xunit.Sdk;
 
 namespace Kontent.Statiq.Tests
 {
@@ -42,6 +46,23 @@ namespace Kontent.Statiq.Tests
             // Assert
             docs.Should().HaveCount(1);
             A.CallTo(() => deliveryClient.GetItemsFeed<Article>(A<IEnumerable<IQueryParameter>>._)).MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task It_should_handle_API_errors()
+        {
+            // Arrange
+            var deliveryClient = A.Fake<IDeliveryClient>()
+                .WithFakeContentFeedError<Article>();
+
+            var sut = new Kontent<Article>(deliveryClient)
+                .WithItemsFeed();
+
+            // Act
+            Func<Task> act = async () => await sut.ExecuteAsync(A.Fake<IExecutionContext>());
+
+            // Assert
+            await act.ShouldThrowAsync<InvalidOperationException>();
         }
     }
 }

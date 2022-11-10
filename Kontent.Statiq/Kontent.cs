@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Module = Statiq.Common.Module;
 
 namespace Kontent.Statiq
@@ -56,7 +57,11 @@ namespace Kontent.Statiq
                 while (feed.HasMoreResults)
                 {
                     var nextBatch = await feed.FetchNextBatchAsync();
-                    
+                    if (!nextBatch.ApiResponse.IsSuccess)
+                    {
+                        throw new InvalidOperationException($"Failed to load data from Kontent item feed for content type {typeof(TContentModel).Name} : {nextBatch.ApiResponse.Error.Message}");
+                    }
+
                     var outputDocuments = nextBatch.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
                     
                     documents.AddRange(outputDocuments);
@@ -67,8 +72,17 @@ namespace Kontent.Statiq
             else
             {
                 var items = await _client.GetItemsAsync<TContentModel>(QueryParameters);
+                if (!items.ApiResponse.IsSuccess)
+                {
+                    throw new InvalidOperationException($"Failed to load data from Kontent for content type {typeof(TContentModel).Name} : {items.ApiResponse.Error.Message}");
+                }
 
-                return items.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
+                if (items.Items == null || items.Items.Count == 0)
+                {
+                    context.Logger.LogWarning($"Query for {typeof(TContentModel).Name} returned no results.");
+                }
+
+                return items.Items?.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray() ?? Array.Empty<IDocument>();
             }
         }
     }

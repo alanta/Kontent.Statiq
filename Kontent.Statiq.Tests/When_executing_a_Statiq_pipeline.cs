@@ -3,12 +3,14 @@ using FluentAssertions;
 using Kontent.Ai.Delivery.Abstractions;
 using Kontent.Statiq.Tests.Models;
 using Kontent.Statiq.Tests.Tools;
+using Shouldly;
 using Statiq.Common;
 using Statiq.Testing;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Kontent.Statiq.Tests
@@ -49,6 +51,43 @@ namespace Kontent.Statiq.Tests
             metadata.Get<string>(KontentKeys.System.CodeName).Should().Be("coffee_beverages_explained");
             metadata.Get<string>(KontentKeys.System.Name).Should().Be("Coffee Beverages Explained");
             metadata.Get<DateTime>(KontentKeys.System.LastModified).Should().BeCloseTo(new DateTime(2019, 09, 18, 10, 58, 38, 917), TimeSpan.FromMilliseconds(100));
+        }
+
+        [Fact]
+        public async Task It_should_handle_API_errors()
+        {
+            // Arrange
+            var deliveryClient = A.Fake<IDeliveryClient>()
+                .WithFakeContentError<Article>();
+
+            var sut = new Kontent<Article>(deliveryClient);
+
+            // Act
+            Func<Task> act = async () => await sut.ExecuteAsync(A.Fake<IExecutionContext>());
+
+            // Assert
+            await act.ShouldThrowAsync<InvalidOperationException>();
+        }
+
+        [Fact]
+        public async Task It_should_warn_on_empty_result()
+        {
+            // Arrange
+            var deliveryClient = A.Fake<IDeliveryClient>()
+                .WithFakeContent<Article>();
+
+            var context = A.Fake<IExecutionContext>();
+            var logger = A.Fake<ILogger>();
+            A.CallTo(() => context.Logger).Returns(logger);
+            
+            var sut = new Kontent<Article>(deliveryClient);
+
+            // Act
+            var result = await sut.ExecuteAsync(context);
+
+            // Assert
+            result.Should().HaveCount(0);
+            logger.VerifyLogged(LogLevel.Warning, "Query for Article returned no results");
         }
 
         [Fact]

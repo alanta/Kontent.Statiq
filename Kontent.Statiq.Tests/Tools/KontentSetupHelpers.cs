@@ -28,6 +28,7 @@ namespace Kontent.Statiq.Tests.Tools
                 moreData = false; // return a single batch
                 var data = A.Fake<IDeliveryItemsFeedResponse<TContent>>();
                 A.CallTo(() => data.Items).Returns(content);
+                A.CallTo(() => data.ApiResponse.IsSuccess).Returns(true);
                 return Task.FromResult(data);
             });
             A.CallTo(() => client.GetItemsFeed<TContent>(A<IEnumerable<IQueryParameter>>._))

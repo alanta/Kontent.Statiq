@@ -57,7 +57,11 @@ namespace Kontent.Statiq
                 while (feed.HasMoreResults)
                 {
                     var nextBatch = await feed.FetchNextBatchAsync();
-                    
+                    if (!nextBatch.ApiResponse.IsSuccess)
+                    {
+                        throw new InvalidOperationException($"Failed to load data from Kontent item feed for content type {typeof(TContentModel).Name} : {nextBatch.ApiResponse.Error.Message}");
+                    }
+
                     var outputDocuments = nextBatch.Items.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray();
                     
                     documents.AddRange(outputDocuments);

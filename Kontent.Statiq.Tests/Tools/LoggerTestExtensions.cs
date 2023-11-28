@@ -18,8 +18,7 @@ public static class LoggerTestExtensions
 
         if (actualLevel != level)
         {
-            throw new AssertActualExpectedException($"[{level}] {logMessage}", $"[{actualLevel}] {actualMessage}",
-                $"Unexpected log level for log message");
+            throw new XunitException($"Unexpected log level for log message. Expected: [{level}] `{logMessage}`. Actual: [{actualLevel}] `{actualMessage}`");
         }
     }
         

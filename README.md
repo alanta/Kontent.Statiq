@@ -5,7 +5,7 @@
 
 Module to retrieve content from [Kentico Kontent](https://kontent.ai) for building static websites with [Statiq](https://Statiq.dev).
 
-Works with .NET 6.
+Works with .NET 8.
 
 ## Getting started
 
@@ -63,7 +63,7 @@ public static class Program
                 services.AddSingleton<ITypeProvider, CustomTypeProvider>();
                 // Configure Delivery SDK
                 services.AddDeliveryClient(opts =>
-                    opts.WithProjectId("<your-project-id>")
+                    opts.WithEnvironmentId("<your-environment-id>")
                         .UseProductionApi()
                         .Build());
             })

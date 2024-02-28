@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <Authors>Marnix van Valen</Authors>
     <Company>Kontent.Statiq</Company>
     <Description>Kentico Kontent module for Statiq. Fetch content and assets from Kontent headless CMS.</Description>
@@ -29,8 +29,8 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kontent.Ai.Delivery" Version="17.0.0" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.38.0.46746">
+    <PackageReference Include="Kontent.Ai.Delivery" Version="18.0.0" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.20.0.85982">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -32,29 +32,25 @@ namespace Kontent.Statiq
                 context.GetContentProvider(_cached[asset.LocalPath.ToString()].Data, _cached[asset.LocalPath.ToString()].MediaType)
             )).ToList();
 
-            if (newAssets.Length != assets.Length)
+            if( newAssets.Length == 0 )
             {
-                context.LogInformation(null, $"Downloading {newAssets.Length} files, skipping {assets.Length - newAssets.Length} already downloaded.");
+                context.LogInformation(null, $"Skipping image download because there are no new images.");
+            }
+            else if( newAssets.Length != assets.Length ) 
+            {
+                context.LogInformation(null, $"Downloading {newAssets.Length} files, skipping {assets.Length-newAssets.Length} already downloaded.");
             }
 
-            if (newAssets.Length > 0)
-            {
-                await DownloadNewAssets(context, newAssets, downloadsWithDestination);
-            }
+            var childModules = newAssets.Select(a => a.OriginalUrl).Chunk(20).Select( x => new ReadWeb(x.ToArray()) );
 
-            return downloadsWithDestination;
-        }
 
-        private async Task DownloadNewAssets(IExecutionContext context, KontentImageDownload[] assets, List<IDocument> downloadsWithDestination)
-        {
             var downloads = new List<IDocument>();
 
             // Workaround for unlimited concurrency in ReadWeb. By fetching chunks of 20 images we prevent timeouts 
             // caused by flooding the Kontent Delivery API with 100s of concurrent requests.
-            foreach (var batch in assets.Select(a => a.OriginalUrl).Chunk(20))
+            foreach (var module in childModules)
             {
-                var module = new ReadWeb(batch);
-                var documents = await module.ExecuteAsync(context);
+                var documents = await module!.ExecuteAsync(context);
                 downloads.AddRange(documents);
             }
 
@@ -62,14 +58,18 @@ namespace Kontent.Statiq
             {
                 var downloadedUrl = download.Get<string>(Keys.SourceUri);
                 var asset = assets.FirstOrDefault(a => a.OriginalUrl == downloadedUrl);
-                if (asset == null)
+                if (asset != null)
+                {
+                    _cached[asset.LocalPath.ToString()]=new CachedImage(Data: await download.GetContentBytesAsync(), MediaType: download.ContentProvider.MediaType);
+                    downloadsWithDestination.Add(download.Clone(destination: asset.LocalPath.ToString().ToLower().TrimStart('/')));
+                }
+                else
                 {
                     throw new InvalidOperationException($"No asset found for url {downloadedUrl}");
                 }
-                
-                _cached[asset.LocalPath.ToString()] = new CachedImage(Data: await download.GetContentBytesAsync(), MediaType: download.ContentProvider.MediaType);
-                downloadsWithDestination.Add(download.Clone(destination: asset.LocalPath.ToString().ToLower().TrimStart('/')));
             }
+
+            return downloadsWithDestination;
         }
     }
 }

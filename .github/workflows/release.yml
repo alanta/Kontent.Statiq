@@ -17,24 +17,40 @@ jobs:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       with:
         fetch-depth: 0 # GitVersion needs the full history and all tags
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@dcb17efb49ec7f20efdebce79cc397a3952c63db # v1.2.0
-      with:
-        versionSpec: '5.x'
-    - name: Use GitVersion
-      id: gitversion # step id used as reference for output values
-      uses: gittools/actions/gitversion/execute@dcb17efb49ec7f20efdebce79cc397a3952c63db # v1.2.0
-      env:
-        # On a tag push GITHUB_REF is refs/tags/<tag>, and GitVersion takes its branch
-        # name from the build environment. It would treat "tags/v2.0-beta16" as a branch
-        # and produce a version like 2.0.0-tags-v2-0-beta1-0001. Releases are always
-        # tagged on main, so tell GitVersion that is the branch it is looking at.
-        GITHUB_REF: refs/heads/main
+    # actions/checkout leaves us detached at the tag, and GitVersion needs to see a
+    # branch to work out the version. Releases are always cut from main, so put main
+    # on the commit that was tagged.
+    - name: Point main at the tagged commit
+      run: git checkout -B main "$GITHUB_SHA"
     - name: Setup dotnet
       uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
       with:
         dotnet-version: |
           8.x
+    # The gittools action is not used here. It hands GitVersion the branch from the
+    # build environment, which on a tag push is refs/tags/<tag>, and GitVersion then
+    # treats that as a branch name and produces versions like
+    # 2.0.0-tags-v2-0-beta1-0001. Setting GITHUB_REF on the step does not help, the
+    # action overrides it. Running the CLI with the build server integration disabled
+    # makes GitVersion use the checked out branch instead.
+    - name: Install GitVersion
+      run: |
+        dotnet tool install --global GitVersion.Tool --version 5.12.0
+        echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+    - name: Use GitVersion
+      id: gitversion
+      run: |
+        version=$(env -u GITHUB_ACTIONS dotnet-gitversion /showvariable NuGetVersionV2)
+        prerelease_tag=$(env -u GITHUB_ACTIONS dotnet-gitversion /showvariable PreReleaseTag)
+        echo "Calculated version: $version"
+        if [ -z "$version" ]; then echo "GitVersion produced no version" >&2; exit 1; fi
+        case "$version" in
+          *tags-*|*no-branch*) echo "Refusing to release with version '$version'" >&2; exit 1 ;;
+        esac
+        {
+          echo "nuGetVersionV2=$version"
+          if [ -n "$prerelease_tag" ]; then echo "prerelease=true"; else echo "prerelease=false"; fi
+        } >> "$GITHUB_OUTPUT"
     - name: Build with dotnet
       env:
         VERSION: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
@@ -50,7 +66,7 @@ jobs:
         if-no-files-found: error
     outputs:
       nugetversion: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
-      prerelease: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+      prerelease: ${{ steps.gitversion.outputs.prerelease }}
 
   publish:
     needs: build
@@ -59,6 +75,10 @@ jobs:
     permissions:
       contents: write # needed to create the release
     steps:
+      # Only needed to read the tag message, which becomes the release notes.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -82,9 +102,16 @@ jobs:
           else
             prerelease_flag=""
           fi
+          # The annotated tag message is the release notes, so they are written once
+          # when the release is tagged and travel with the tag.
+          git tag -l --format='%(contents:body)' "$TAG" > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Release $VERSION" > release-notes.md
+          fi
           gh release create "$TAG" \
             --draft \
             --title "Release $VERSION" \
+            --notes-file release-notes.md \
             $prerelease_flag \
             "./Kontent.Statiq.$VERSION.nupkg" \
             "./Kontent.Statiq.$VERSION.snupkg"

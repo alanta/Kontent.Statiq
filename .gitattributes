@@ -1,0 +1,17 @@
+# Normalize line endings.
+# Text files are stored with LF in the repository and checked out with LF on
+# every platform, so switching between Windows, Linux and macOS never produces
+# whole-file diffs.
+* text=auto eol=lf
+
+# Visual Studio rewrites these with CRLF, so keep them that way.
+*.sln text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files.
+*.png binary
+*.ico binary
+*.snk binary
+*.nupkg binary
+*.snupkg binary

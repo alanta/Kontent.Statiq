@@ -53,7 +53,7 @@ namespace Kontent.Statiq
         /// <param name="metadata"></param>
         private static void MapSystemMetadata(object item, PropertyInfo[] props, List<KeyValuePair<string, object>> metadata)
         {
-            if (props.FirstOrDefault(prop => typeof(IContentItemSystemAttributes).IsAssignableFrom(prop.PropertyType))
+            if (Array.Find(props, prop => typeof(IContentItemSystemAttributes).IsAssignableFrom(prop.PropertyType))
                 ?.GetValue(item) is IContentItemSystemAttributes systemProp)
             {
                 metadata.AddRange(new[]

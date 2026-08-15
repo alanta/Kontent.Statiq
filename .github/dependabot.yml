@@ -9,6 +9,17 @@ updates:
       interval: weekly
     commit-message:
       prefix: "ci"
+    ignore:
+      # v1.2.0 is the last release of these actions that installs GitVersion 5.
+      # v2 and up install GitVersion 6, which renames the ContinuousDelivery mode
+      # we use to ManualDeployment and removes the NuGetVersionV2 output that all
+      # three workflows read. Taking such a bump would silently change the version
+      # of every published package. Only move these as part of a deliberate
+      # GitVersion 6 migration.
+      - dependency-name: gittools/actions/gitversion/setup
+        versions: [">=2.0.0"]
+      - dependency-name: gittools/actions/gitversion/execute
+        versions: [">=2.0.0"]
 
   - package-ecosystem: nuget
     directory: /

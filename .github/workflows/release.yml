@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0 # GitVersion needs the full history and all tags
     # actions/checkout leaves us detached at the tag, and GitVersion needs to see a
@@ -76,7 +76,7 @@ jobs:
       contents: write # needed to create the release
     steps:
       # Only needed to read the tag message, which becomes the release notes.
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Download build artifacts

@@ -12,8 +12,6 @@ namespace Kontent.Statiq
     /// </summary>
     public static class KontentAssetHelper
     {
-        private static readonly MD5 Md5 = MD5.Create();
-
         /// <summary>
         /// Get the image downloads for the document. These are added by the <see cref="KontentImageProcessor"/>.
         /// </summary>
@@ -48,9 +46,10 @@ namespace Kontent.Statiq
                         .Select(kv => $"{kv.key}={kv.value}"));
 
                 // hash the query - no need to disclose what transforms were done on the image
-                var hash = string.Join("", Md5
-                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(sortedQuery))
-                    .Select(b => b.ToString("x2")));
+                // Note: use the one-shot API, a shared MD5 instance is not thread-safe and Statiq
+                // processes documents concurrently.
+                var hash = Convert.ToHexString(
+                    MD5.HashData(System.Text.Encoding.UTF8.GetBytes(sortedQuery))).ToLowerInvariant();
 
                 fileName = $"{hash}-{fileName}";
             }

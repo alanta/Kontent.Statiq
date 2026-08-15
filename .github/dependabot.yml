@@ -1,0 +1,31 @@
+version: 2
+
+updates:
+  # Actions in the workflows are pinned to commit SHAs, which freezes them until
+  # something moves the pins. This is what moves them - don't disable it.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      test-dependencies:
+        patterns:
+        - xunit*
+        - FakeItEasy
+        - FluentAssertions
+        - Microsoft.NET.Test.Sdk
+        - RichardSzalay.MockHttp
+        - coverlet.*
+    ignore:
+      # Version 8 moved to the Xceed Community License, which requires a paid
+      # licence for commercial use.
+      - dependency-name: FluentAssertions
+        versions: [">=8.0.0"]

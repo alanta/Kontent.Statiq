@@ -19,9 +19,10 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_REPO: ${{ github.repository }}
-      run: gh release download "${{ github.event.release.tag_name }}" --pattern "*.nupkg" --pattern "*.snupkg"
+        RELEASE_TAG: ${{ github.event.release.tag_name }}
+      run: gh release download "$RELEASE_TAG" --pattern "*.nupkg" --pattern "*.snupkg"
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
       with:
         dotnet-version: |
           8.x
@@ -30,10 +31,13 @@ jobs:
     # to run right before the push. See the trusted publishing policy on nuget.org,
     # which is tied to this workflow being called publish.yml - don't rename it.
     - name: Log in to nuget.org
-      uses: NuGet/login@v1
+      uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
       id: nuget-login
       with:
         user: marnixvanvalen # nuget.org profile name, not an email address
     - name: Publish package
+      env:
+        # Passed as environment data, never as a command line argument
+        NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
       # Pushing the .nupkg also pushes the matching .snupkg symbols package
-      run: dotnet nuget push ./*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./*.nupkg --api-key "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json

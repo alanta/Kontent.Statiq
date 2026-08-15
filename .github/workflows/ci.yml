@@ -20,7 +20,7 @@ jobs:
       with:
         fetch-depth: 0 # GitVersion needs the full history and all tags
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@dcb17efb49ec7f20efdebce79cc397a3952c63db # v1.2.0
+      uses: gittools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
       with:
         versionSpec: '5.x'
     - name: Use GitVersion

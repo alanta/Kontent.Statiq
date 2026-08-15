@@ -1,6 +1,6 @@
 # Kontent.Statiq
 
-![CI](https://github.com/alanta/Kontent.Statiq/workflows/CI/badge.svg?branch=master)
+[![CI](https://github.com/alanta/Kontent.Statiq/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alanta/Kontent.Statiq/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/Kontent.Statiq.svg)](https://www.nuget.org/packages/Kontent.Statiq)
 
 Module to retrieve content from [Kentico Kontent](https://kontent.ai) for building static websites with [Statiq](https://Statiq.dev).

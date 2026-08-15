@@ -3,20 +3,27 @@ on:
   release:
     types: [published] # When a release is published, push the Nuget package to nuget.org
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download artifact
-      run: wget -nv ${{ github.event.release.assets[0].browser_download_url }}
+    - name: Download release assets
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+      run: gh release download "${{ github.event.release.tag_name }}" --pattern "*.nupkg" --pattern "*.snupkg"
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
           8.x
     - name: Publish package
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: dotnet nuget push ${{ github.event.release.assets[0].name }} --api-key $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+      # Pushing the .nupkg also pushes the matching .snupkg symbols package
+      run: dotnet nuget push ./*.nupkg --api-key $NUGET_API_KEY -s https://api.nuget.org/v3/index.json

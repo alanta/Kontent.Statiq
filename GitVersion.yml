@@ -1,6 +1,9 @@
 mode: ContinuousDelivery
 branches:
   master: {
-    regex: ^main
+    regex: ^main,
+    # Releases from main are prereleases while Statiq itself is still in beta.
+    # This produces 2.0.0-beta.16 / NuGet 2.0.0-beta0016, continuing the sequence
+    # of the 2.0.0-beta0015 package that is on nuget.org.
+    tag: beta
   }
-

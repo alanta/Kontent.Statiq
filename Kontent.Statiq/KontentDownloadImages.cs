@@ -13,7 +13,9 @@ namespace Kontent.Statiq
     /// </summary>
     public class KontentDownloadImages : Module
     {
-        readonly Dictionary<string, CachedImage> _cached = new(StringComparer.OrdinalIgnoreCase);
+        // Not resettable: the whole point of this cache is to survive between executions so that
+        // re-rendering in preview mode doesn't download every image again.
+        readonly ConcurrentCache<string, CachedImage> _cached = new(false, StringComparer.OrdinalIgnoreCase);
 
         internal record CachedImage(byte[] Data, string MediaType);
 
@@ -60,7 +62,9 @@ namespace Kontent.Statiq
                 var asset = assets.FirstOrDefault(a => a.OriginalUrl == downloadedUrl);
                 if (asset != null)
                 {
-                    _cached[asset.LocalPath.ToString()]=new CachedImage(Data: await download.GetContentBytesAsync(), MediaType: download.ContentProvider.MediaType);
+                    var data = new CachedImage(Data: await download.GetContentBytesAsync(),
+                        MediaType: download.ContentProvider.MediaType);
+                    _cached.AddOrUpdate(asset.LocalPath.ToString(), data, (_, _) => data);
                     downloadsWithDestination.Add(download.Clone(destination: asset.LocalPath.ToString().ToLower().TrimStart('/')));
                 }
                 else

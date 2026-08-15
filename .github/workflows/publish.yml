@@ -10,6 +10,9 @@ jobs:
   publish:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # to download the release assets
+      id-token: write # to request the OIDC token for trusted publishing
 
     steps:
     - name: Download release assets
@@ -22,8 +25,15 @@ jobs:
       with:
         dotnet-version: |
           8.x
+    # Trusted publishing: exchange a GitHub OIDC token for a short-lived nuget.org
+    # API key. The key is valid for one hour and can only be used once, so this has
+    # to run right before the push. See the trusted publishing policy on nuget.org,
+    # which is tied to this workflow being called publish.yml - don't rename it.
+    - name: Log in to nuget.org
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: marnixvanvalen # nuget.org profile name, not an email address
     - name: Publish package
-      env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       # Pushing the .nupkg also pushes the matching .snupkg symbols package
-      run: dotnet nuget push ./*.nupkg --api-key $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

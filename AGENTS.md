@@ -47,8 +47,12 @@ but the test host will not start. Either install the .NET 8 runtime or run the t
 Notes:
 - `GeneratePackageOnBuild` is on, so every build packs a `.nupkg` — the `NU5104` warning
   (stable package with prerelease Statiq dependency) is expected and harmless.
-- SonarAnalyzer runs as part of the build. Existing `S1133`/`S6602` warnings are known noise;
-  don't "fix" deprecated-code warnings on public API without an explicit deprecation decision.
+- SonarAnalyzer runs as part of the build and the build is warning free — keep it that way.
+  `S1133` ("remove this deprecated code someday") is turned off in `.editorconfig` because this
+  library deliberately marks public API `[Obsolete]` before removing it in a major version.
+- `NU5104` (stable package with a prerelease Statiq dependency) only appears when you build
+  without specifying a version, because the version then defaults to a stable `1.0.0`. Released
+  builds pass `-p:Version=` with a prerelease version and don't hit it.
 - Statiq packages are referenced as `1.0.0-*` (floating prerelease). Statiq 1.0 has been in
   beta for years; `beta.72` is the newest and it targets netcoreapp3.1, so it does not constrain
   which .NET version this library targets.

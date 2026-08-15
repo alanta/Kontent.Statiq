@@ -59,7 +59,7 @@ namespace Kontent.Statiq
             foreach (var download in downloads)
             {
                 var downloadedUrl = download.Get<string>(Keys.SourceUri);
-                var asset = assets.FirstOrDefault(a => a.OriginalUrl == downloadedUrl);
+                var asset = Array.Find(assets, a => a.OriginalUrl == downloadedUrl);
                 if (asset != null)
                 {
                     var data = new CachedImage(Data: await download.GetContentBytesAsync(),

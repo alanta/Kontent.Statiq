@@ -31,15 +31,18 @@ Ignore `obj/`, `bin/`, `.vs/`, `_NCrunch_Kontent.Statiq/` — build/IDE leftover
 
 ## Build and test
 
-Target framework is **net8.0** for both projects. If only a newer SDK is installed, the build
-still works (targeting packs come from NuGet) but the **test host needs a roll-forward**:
+Target framework is **net8.0** for both projects.
 
 ```bash
 dotnet build Kontent.Statiq.sln -c Debug
-DOTNET_ROLL_FORWARD=LatestMajor dotnet test Kontent.Statiq.sln -c Debug --no-build
+dotnet test Kontent.Statiq.sln -c Debug --no-build
 ```
 
-Expected: build succeeds with warnings only; all tests pass (34 as of the last check).
+Expected: build succeeds with warnings only; all tests pass (41 as of the last check).
+
+If only a newer SDK/runtime is installed, the build still works (targeting packs come from NuGet)
+but the test host will not start. Either install the .NET 8 runtime or run the tests with
+`DOTNET_ROLL_FORWARD=LatestMajor dotnet test ...`.
 
 Notes:
 - `GeneratePackageOnBuild` is on, so every build packs a `.nupkg` — the `NU5104` warning
@@ -69,6 +72,13 @@ whose entire content then shows up as modified.
   the extension helpers in `Tools/KontentSetupHelpers.cs`); HTTP is faked with
   **RichardSzalay.MockHttp**; pipelines are driven with **Statiq.Testing** (`Engine`, `TestDocument`).
 - Prefer extending `KontentSetupHelpers` over hand-rolling new Delivery API fakes.
+- Tests never hit the network. `TestExecutionContext.HttpResponseFunc` intercepts every HTTP call
+  (its default returns an empty `200`); see the `FakeAssetServer` in `When_downloading_images.cs`
+  for the pattern of serving content *and* counting requests.
+- `TestExecutionContext` is a test double, not the real `Engine`, so engine-level behaviour is not
+  exercised — notably it never calls `IConcurrentCache.ResetCaches()`. A cache registered as
+  `resettable` therefore looks like it survives between executions in tests when it would not in a
+  real build. Check such assumptions against the Statiq source, not just a green test run.
 - `Nullable` is enabled in both projects — keep annotations correct rather than sprinkling `!`.
 - Public API needs XML doc comments (`GenerateDocumentationFile` is on; missing docs warn).
 - Modules can be executed concurrently by Statiq across documents — **any shared state in a module

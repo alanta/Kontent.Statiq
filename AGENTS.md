@@ -6,6 +6,11 @@ provides [Statiq](https://statiq.dev) modules for pulling content and assets fro
 
 Repo: https://github.com/alanta/Kontent.Statiq · License: MIT · Package: `Kontent.Statiq`
 
+> **Read [SECURITY_GUIDELINES.md](SECURITY_GUIDELINES.md) before changing anything under
+> `.github/workflows/` or touching dependencies.** Those rules are binding, they include a
+> review checklist to run your diff against, and a deviation has to be stated in the PR
+> description rather than left for the reviewer to spot.
+
 ## Layout
 
 | Path | What it is |

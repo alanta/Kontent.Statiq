@@ -43,13 +43,14 @@ namespace Kontent.Statiq
                 context.LogInformation(null, $"Downloading {newAssets.Length} files, skipping {assets.Length-newAssets.Length} already downloaded.");
             }
 
-            var childModules = newAssets.Select(a => a.OriginalUrl).Chunk(20).Select( x => new ReadWeb(x.ToArray()) );
+            var childModules = newAssets.Select(a => a.OriginalUrl).Chunk(20).Select( x => new ReadWebAssets(x.ToArray()) );
 
 
             var downloads = new List<IDocument>();
 
-            // Workaround for unlimited concurrency in ReadWeb. By fetching chunks of 20 images we prevent timeouts 
-            // caused by flooding the Kontent Delivery API with 100s of concurrent requests.
+            // ReadWebAssets retries throttled requests, but it still fetches its whole batch in parallel.
+            // Fetching chunks of 20 keeps us from flooding the Kontent Delivery API with 100s of
+            // concurrent requests and backing off on all of them at once.
             foreach (var module in childModules)
             {
                 var documents = await module!.ExecuteAsync(context);

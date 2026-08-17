@@ -86,10 +86,17 @@ namespace Kontent.Statiq
 
                 return new WebResponse(new Uri(uri), data, content.Headers.ContentType?.MediaType, headers);
             }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                // The execution is being torn down, not a download failure.
+                throw;
+            }
             catch (Exception ex)
             {
+                // A failure that outlived the retries is handled the same way as a non-success
+                // status: drop the document and let the build fail on the logged error.
                 context.LogError(ex, "Failed to download {Uri}", uri);
-                throw;
+                return null;
             }
         }
 

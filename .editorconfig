@@ -20,3 +20,17 @@ indent_size = 2
 # version, which is exactly what the attribute is for. The rule only reminds us that
 # the members are still there, so it has nothing to report on a build.
 dotnet_diagnostic.S1133.severity = none
+
+# S2955: "Generic parameters not constrained to reference types should not be compared
+# to null."
+# The rule reads the declared signature, not the instantiated type, so it fires on calls
+# like Array.Find<T> where T is inferred as a class and the null check is perfectly safe.
+# The real case it exists for - a null check on an unconstrained type parameter of our own
+# method - is worth knowing about, so re-enable this if the false positives stop.
+dotnet_diagnostic.S2955.severity = none
+
+# S4158: "Remove this call, the collection is known to be empty here."
+# Its emptiness tracking does not model every way a collection gets filled -
+# Dictionary.TryAdd in a loop, for one - and it then reports a lookup on a collection we
+# just populated.
+dotnet_diagnostic.S4158.severity = none

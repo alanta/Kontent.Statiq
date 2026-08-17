@@ -48,8 +48,14 @@ namespace Kontent.Statiq
                 // hash the query - no need to disclose what transforms were done on the image
                 // Note: use the one-shot API, a shared MD5 instance is not thread-safe and Statiq
                 // processes documents concurrently.
+                // MD5 is a filename discriminator here, not a security control: it only has to
+                // keep two different query strings from colliding on one local file. Nothing
+                // verifies it and nothing secret goes into it. Switching algorithms would rename
+                // every already-published asset, breaking links on existing sites.
+#pragma warning disable S4790 // Hashing is not used for a security purpose here
                 var hash = Convert.ToHexString(
                     MD5.HashData(System.Text.Encoding.UTF8.GetBytes(sortedQuery))).ToLowerInvariant();
+#pragma warning restore S4790
 
                 fileName = $"{hash}-{fileName}";
             }

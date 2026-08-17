@@ -53,7 +53,7 @@ namespace Kontent.Statiq
             // concurrent requests and backing off on all of them at once.
             foreach (var module in childModules)
             {
-                var documents = await module!.ExecuteAsync(context);
+                var documents = await module.ExecuteAsync(context);
                 downloads.AddRange(documents);
             }
 

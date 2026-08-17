@@ -25,7 +25,11 @@ namespace Kontent.Statiq
                 var list = new List<IDocument>();
                 var parent = doc.AsKontent<TContentType>();
                 
-                if (parent != null)
+                // TContentType is deliberately left unconstrained - these APIs predate proper
+                // nullability annotations and tightening them is a job of its own. Comparing to
+                // default covers both reference and value types; a plain null check would always
+                // pass for a struct.
+                if (!EqualityComparer<TContentType>.Default.Equals(parent, default))
                 {
                     var children = getChildren(parent)?.ToArray() ?? Array.Empty<object>();
                     foreach (var item in children)

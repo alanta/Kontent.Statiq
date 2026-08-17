@@ -70,7 +70,7 @@ namespace Kontent.Statiq
             var html = await ParseHtmlAsync(input, context);
 
             if (html == null)
-                return input.Yield();
+                return await input.YieldAsync();
 
             var downloadUrls = new List<KontentImageDownload>();
             var localBasePath = await _localBasePath.GetValueAsync(input, context);
@@ -79,11 +79,11 @@ namespace Kontent.Statiq
             ExtractHeadAssets(context, html, localBasePath, downloadUrls);
             ExtractBackgroundImages(context, html, localBasePath, downloadUrls);
 
-            return input.Clone(
+            return await input.Clone(
                 new[] { new KeyValuePair<string, object>(KontentKeys.Images.Downloads, downloadUrls.ToArray()) },
                 context.GetContentProvider(
                     html.ToHtml(), // Note that AngleSharp always injects <html> and <body> tags so can't use this module with HTML fragments
-                    MediaTypes.Html)).Yield();
+                    MediaTypes.Html)).YieldAsync();
         }
 
         private void ExtractHeadAssets(IExecutionContext context, IHtmlDocument html, NormalizedPath localBasePath, List<KontentImageDownload> downloadUrls)
@@ -101,7 +101,7 @@ namespace Kontent.Statiq
 
                 var localPath = KontentAssetHelper.GetLocalFileName(imageSource!, localBasePath);
 
-                context.LogDebug("Replacing metadata image {source} => {destination}", imageSource, localPath);
+                context.LogDebug("Replacing metadata image {Source} => {Destination}", imageSource, localPath);
 
                 meta.SetAttribute(AngleSharp.Dom.AttributeNames.Content, context.GetLink(localPath, true));
 
@@ -132,7 +132,7 @@ namespace Kontent.Statiq
 
                 var localPath = KontentAssetHelper.GetLocalFileName(imageSource!, localBasePath);
 
-                context.LogDebug("Replacing image {source} => {destination}", image.Source, localPath);
+                context.LogDebug("Replacing image {Source} => {Destination}", image.Source, localPath);
 
                 // update the content
                 image.Source = context.GetLink(localPath);
@@ -144,8 +144,6 @@ namespace Kontent.Statiq
         
         private void ExtractBackgroundImages(IExecutionContext context, IHtmlDocument html, NormalizedPath localBasePath, List<KontentImageDownload> downloadUrls)
         {
-            Regex urlParser = new Regex(@"url\('?(?<url>[^'\""\)]+)'?\)");
-            
             string ReplaceUrls(Match match)
             {
                 var url = match.Groups["url"].Value;
@@ -156,7 +154,7 @@ namespace Kontent.Statiq
 
                 var localPath = KontentAssetHelper.GetLocalFileName(url, localBasePath);
 
-                context.LogDebug("Replacing background image {source} => {destination}", url, localPath);
+                context.LogDebug("Replacing background image {Source} => {Destination}", url, localPath);
 
                 // update the content
                 var newUrl = context.GetLink(localPath, true);
@@ -172,7 +170,7 @@ namespace Kontent.Statiq
             foreach (var element in html.All.OfType<Element>().Where(e => e.GetAttribute("style")?.Contains("background", StringComparison.OrdinalIgnoreCase) ?? false))
             {
                 var inlineStyles = element.GetAttribute("style")!;
-                var updatedStyles = urlParser.Replace(inlineStyles, ReplaceUrls);
+                var updatedStyles = _backgroundUrlRegex.Replace(inlineStyles, ReplaceUrls);
                 element.SetAttribute("style", updatedStyles);
             }
         }
@@ -206,7 +204,7 @@ namespace Kontent.Statiq
                 else
                 {
                     var localPath = KontentAssetHelper.GetLocalFileName(url, localBasePath);
-                    context.LogDebug("Replacing srcset image {url} => {localPath}", url, localPath);
+                    context.LogDebug("Replacing srcset image {Url} => {LocalPath}", url, localPath);
                     newSourceSet.Add($"{localPath} {size}".Trim());
                     downloads.Add(new KontentImageDownload(url, localPath));
                 }
@@ -221,6 +219,7 @@ namespace Kontent.Statiq
             return (string.Join(",", newSourceSet), downloads.ToArray());
         }
 
+        private static readonly Regex _backgroundUrlRegex = new Regex(@"url\('?(?<url>[^'\""\)]+)'?\)", RegexOptions.None, TimeSpan.FromSeconds(5));
         private static readonly Regex _sourceSetRegex = new Regex("(?:(?<url>.*)\\s+(?<size>[0-9]+[w|x]))", RegexOptions.IgnoreCase | RegexOptions.Multiline, TimeSpan.FromSeconds(5));
         private static readonly Regex _remoteUrlRegex = new Regex("^https?://", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(5));
 
@@ -239,7 +238,7 @@ namespace Kontent.Statiq
             }
             catch (Exception ex)
             {
-                context.LogWarning("Exception while parsing HTML for {html}: {message}", document.ToSafeDisplayString(), ex.Message);
+                context.LogWarning(ex, "Exception while parsing HTML for {Html}", document.ToSafeDisplayString());
             }
             return null;
         }

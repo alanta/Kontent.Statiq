@@ -12,10 +12,11 @@ updates:
     ignore:
       # v1.2.0 is the last release of these actions that installs GitVersion 5.
       # v2 and up install GitVersion 6, which renames the ContinuousDelivery mode
-      # we use to ManualDeployment and removes the NuGetVersionV2 output that all
-      # three workflows read. Taking such a bump would silently change the version
-      # of every published package. Only move these as part of a deliberate
-      # GitVersion 6 migration.
+      # we use to ManualDeployment and removes the NuGetVersionV2 output that ci.yml
+      # reads. Taking such a bump would silently change the version of every
+      # published package. Only move these as part of a deliberate GitVersion 6
+      # migration - which also has to cover the GitVersion.Tool version that
+      # release.yml installs from the CLI.
       - dependency-name: gittools/actions/gitversion/setup
         versions: [">=2.0.0"]
       - dependency-name: gittools/actions/gitversion/execute
@@ -27,6 +28,9 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
+      # Listed before microsoft-and-system so Microsoft.NET.Test.Sdk keeps
+      # travelling with the rest of the test stack - a dependency joins the
+      # first group it matches.
       test-dependencies:
         patterns:
         - xunit*
@@ -35,8 +39,16 @@ updates:
         - Microsoft.NET.Test.Sdk
         - RichardSzalay.MockHttp
         - coverlet.*
+      microsoft-and-system:
+        patterns:
+        - Microsoft.*
+        - System.*
     ignore:
       # Version 8 moved to the Xceed Community License, which requires a paid
       # licence for commercial use.
       - dependency-name: FluentAssertions
         versions: [">=8.0.0"]
+      # Major versions of the Delivery SDK change the model/query API this
+      # package wraps, so take them deliberately rather than automatically.
+      - dependency-name: Kontent.Ai.Delivery
+        update-types: ["version-update:semver-major"]

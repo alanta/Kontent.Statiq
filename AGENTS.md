@@ -17,6 +17,7 @@ Repo: https://github.com/alanta/Kontent.Statiq · License: MIT · Package: `Kont
 | --- | --- |
 | `Kontent.Statiq/` | The library. This is the shipped NuGet package. |
 | `Kontent.Statiq.Tests/` | xUnit test project. |
+| `docs/` | Design notes explaining *why* something is built the way it is, for decisions that look like they could be simplified away. Not user-facing docs — those go in `README.md`. |
 | `.github/workflows/` | `ci.yml` (build+test on push), `release.yml` (tag `v*` → draft GitHub release), `publish.yml` (release published → push to nuget.org). |
 | `GitVersion.yml` | Version is derived from git history by GitVersion — never hard-code a version in a csproj. |
 | `README.md` | The user-facing docs *and* the NuGet package readme (`PackageReadmeFile`). Update it when public API changes. |
@@ -28,7 +29,12 @@ Ignore `obj/`, `bin/`, `.vs/`, `_NCrunch_Kontent.Statiq/` — build/IDE leftover
 - `Kontent<TContent>` / `KontentTaxonomy<TTaxonomy>` — the input modules that query the Delivery API.
 - `KontentImageProcessor` — rewrites asset URLs in rendered HTML to local paths and records the
   needed downloads in document metadata under `KontentKeys.Images.Downloads`.
-- `KontentDownloadImages` — reads that metadata and fetches the assets (wraps Statiq's `ReadWeb`).
+- `KontentDownloadImages` — reads that metadata and fetches the assets, in batches of 20, caching
+  results so a preview re-render doesn't download everything again.
+- `ReadWebAssets` — internal; the actual downloader. Deliberately *not* Statiq's `ReadWeb`, which
+  leaks sockets and writes throttling error pages to disk as image content. It only does anonymous
+  GETs and can never do more, because `WebRequestHeaders.ApplyTo` is internal to `Statiq.Core`.
+  Read [docs/asset-downloads.md](docs/asset-downloads.md) before changing either module.
 - `KontentAssetHelper` — url → local filename mapping (query string is hashed into the name).
 - `TypedContentExtensions`, `KontentDocumentHelpers`, `Html/HtmlHelpers` — helpers for Razor views.
 
@@ -43,7 +49,7 @@ dotnet build Kontent.Statiq.sln -c Debug
 dotnet test Kontent.Statiq.sln -c Debug --no-build
 ```
 
-Expected: build succeeds with warnings only; all tests pass (41 as of the last check).
+Expected: build succeeds with warnings only; all tests pass (43 as of the last check).
 
 If only a newer SDK/runtime is installed, the build still works (targeting packs come from NuGet)
 but the test host will not start. Either install the .NET 8 runtime or run the tests with
@@ -87,7 +93,13 @@ whose entire content then shows up as modified.
 - `TestExecutionContext` is a test double, not the real `Engine`, so engine-level behaviour is not
   exercised — notably it never calls `IConcurrentCache.ResetCaches()`. A cache registered as
   `resettable` therefore looks like it survives between executions in tests when it would not in a
-  real build. Check such assumptions against the Statiq source, not just a green test run.
+  real build. `TestEngine.SendHttpRequestWithRetryAsync` is a second instance of the same trap: it
+  is a plain `SendAsync` with the retry policy stripped out, so a test written against it passes
+  whether or not retry works. Check such assumptions against the Statiq source, not just a green
+  test run.
+- A test that expects a failure has to raise `TestExecutionContext.TestLoggerProvider.ThrowLogLevel`
+  first — anything logged at `Warning` or above otherwise becomes an exception before the assertions
+  run. See `When_downloading_images.cs`.
 - `Nullable` is enabled in both projects — keep annotations correct rather than sprinkling `!`.
 - Public API needs XML doc comments (`GenerateDocumentationFile` is on; missing docs warn).
 - Modules can be executed concurrently by Statiq across documents — **any shared state in a module

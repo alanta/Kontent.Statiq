@@ -26,8 +26,13 @@ namespace Kontent.Statiq
                 var parent = doc.AsKontent<TContentType>();
                 
                 // TContentType is deliberately left unconstrained - these APIs predate proper
-                // nullability annotations and tightening them is a job of its own.
+                // nullability annotations and tightening them is a job of its own. S2955 wants a
+                // comparison to default or a class constraint; the constraint would change a
+                // public signature and the comparison reads worse than a null check, so it is
+                // suppressed here rather than worked around.
+#pragma warning disable S2955 // Generic parameter not constrained to a reference type
                 if (parent != null)
+#pragma warning restore S2955
                 {
                     var children = getChildren(parent)?.ToArray() ?? Array.Empty<object>();
                     foreach (var item in children)

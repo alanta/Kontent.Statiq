@@ -7,20 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="9.0.1" />
-    <PackageReference Include="FluentAssertions" Version="7.2.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
-    <PackageReference Include="RichardSzalay.MockHttp" Version="7.1.0" />
-    <PackageReference Include="Statiq.Core" Version="1.0.0-*" />
-    <PackageReference Include="Statiq.Razor" Version="1.0.0-*" />
-    <PackageReference Include="Statiq.Testing" Version="1.0.0-*" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.assert" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+    <PackageReference Include="FakeItEasy" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="RichardSzalay.MockHttp" />
+    <PackageReference Include="Statiq.Core" />
+    <PackageReference Include="Statiq.Razor" />
+    <PackageReference Include="Statiq.Testing" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.assert" />
+    <PackageReference Include="xunit.runner.visualstudio">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="10.0.1">
+    <PackageReference Include="coverlet.collector">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

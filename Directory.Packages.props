@@ -1,0 +1,30 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="FakeItEasy" Version="9.0.1" />
+    <!-- Version 8 moved to the Xceed Community License, which requires a paid licence
+         for commercial use. Stay on 7.x. -->
+    <PackageVersion Include="FluentAssertions" Version="7.2.2" />
+    <PackageVersion Include="Kontent.Ai.Delivery" Version="18.3.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="RichardSzalay.MockHttp" Version="7.1.0" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.32.0.713" />
+    <!-- Statiq has not published since January 2024. These were floating 1.0.0-*, which
+         resolved to beta.72; pinned explicitly so the restored version is visible here
+         instead of only in the lock files. -->
+    <PackageVersion Include="Statiq.Common" Version="1.0.0-beta.72" />
+    <PackageVersion Include="Statiq.Core" Version="1.0.0-beta.72" />
+    <PackageVersion Include="Statiq.Razor" Version="1.0.0-beta.72" />
+    <PackageVersion Include="Statiq.Testing" Version="1.0.0-beta.72" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.assert" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

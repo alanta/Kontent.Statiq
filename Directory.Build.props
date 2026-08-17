@@ -1,0 +1,13 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Every project writes a packages.lock.json, pinning the full transitive closure to
+         exact versions and content hashes. CI restores in locked mode, so a dependency
+         that resolves differently than what was committed fails the build instead of
+         shipping silently. After any package change, regenerate the lock files with a
+         restore that passes the force-evaluate switch, and commit them in the same
+         commit as the version change. See SECURITY_GUIDELINES.md section 2.1. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+</Project>

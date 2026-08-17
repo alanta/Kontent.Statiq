@@ -29,13 +29,13 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Kontent.Ai.Delivery" Version="18.3.0" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.20.0.85982">
+    <PackageReference Include="Kontent.Ai.Delivery" />
+    <PackageReference Include="SonarAnalyzer.CSharp">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Statiq.Common" Version="1.0.0-*" />
-    <PackageReference Include="Statiq.Core" Version="1.0.0-*" />
+    <PackageReference Include="Statiq.Common" />
+    <PackageReference Include="Statiq.Core" />
   </ItemGroup>
 
   <ItemGroup>

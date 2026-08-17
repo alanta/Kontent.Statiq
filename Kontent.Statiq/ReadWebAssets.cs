@@ -47,11 +47,11 @@ namespace Kontent.Statiq
                 uri => GetResponseAsync(uri, client, context), context.CancellationToken);
 
             return responses
-                .Where(response => response is object)
+                .OfType<WebResponse>()
                 .Select(response => context.CreateDocument(
                     new MetadataItems
                     {
-                        { Keys.SourceUri, response!.Uri },
+                        { Keys.SourceUri, response.Uri },
                         { Keys.SourceHeaders, response.Headers }
                     },
                     context.GetContentProvider(response.Data, response.MediaType)))
@@ -69,7 +69,8 @@ namespace Kontent.Statiq
                 {
                     // Passing the response body on would write the error page to disk under the
                     // asset's name, so drop it and let the build fail on the logged error instead.
-                    context.LogError($"Failed to download {uri} : {(int)response.StatusCode} {response.StatusCode}");
+                    context.LogError("Failed to download {Uri} : {StatusCode} {StatusName}",
+                        uri, (int)response.StatusCode, response.StatusCode);
                     return null;
                 }
 
@@ -87,7 +88,7 @@ namespace Kontent.Statiq
             }
             catch (Exception ex)
             {
-                context.LogError($"Failed to download {uri} : {ex}");
+                context.LogError(ex, "Failed to download {Uri}", uri);
                 throw;
             }
         }

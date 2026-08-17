@@ -58,13 +58,11 @@ namespace Kontent.Statiq
             }
 
             // Index the assets by url so matching a download is a lookup instead of a scan of
-            // every asset. TryAdd keeps the first entry for a url, which is what the previous
-            // linear search returned.
-            var assetsByUrl = new Dictionary<string, KontentImageDownload>();
-            foreach (var asset in assets)
-            {
-                assetsByUrl.TryAdd(asset.OriginalUrl, asset);
-            }
+            // every asset. DistinctBy keeps the first asset for a url - the same url can be
+            // written to more than one local path - which is what a linear search would return.
+            var assetsByUrl = assets
+                .DistinctBy(asset => asset.OriginalUrl)
+                .ToDictionary(asset => asset.OriginalUrl);
 
             foreach (var download in downloads)
             {

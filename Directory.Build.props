@@ -10,4 +10,13 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Local builds pack as a prerelease, the same as every version this repo publishes
+         (GitVersion tags main as beta). Without this a bare 'dotnet build' falls back to the
+         SDK default 1.0.0, which is stable, and packing a stable version against the
+         prerelease Statiq packages warns NU5104. CI and release builds pass -p:Version, which
+         overrides this. Suffix only, so there is no version number here to go stale. -->
+    <VersionSuffix>local</VersionSuffix>
+  </PropertyGroup>
+
 </Project>

@@ -57,11 +57,19 @@ namespace Kontent.Statiq
                 downloads.AddRange(documents);
             }
 
+            // Index the assets by url so matching a download is a lookup instead of a scan of
+            // every asset. TryAdd keeps the first entry for a url, which is what the previous
+            // linear search returned.
+            var assetsByUrl = new Dictionary<string, KontentImageDownload>();
+            foreach (var asset in assets)
+            {
+                assetsByUrl.TryAdd(asset.OriginalUrl, asset);
+            }
+
             foreach (var download in downloads)
             {
                 var downloadedUrl = download.Get<string>(Keys.SourceUri);
-                var asset = Array.Find(assets, a => a.OriginalUrl == downloadedUrl);
-                if (asset != null)
+                if (downloadedUrl != null && assetsByUrl.TryGetValue(downloadedUrl, out var asset))
                 {
                     var data = new CachedImage(Data: await download.GetContentBytesAsync(),
                         MediaType: download.ContentProvider.MediaType);

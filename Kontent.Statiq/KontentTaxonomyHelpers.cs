@@ -26,7 +26,7 @@ namespace Kontent.Statiq
             
             var metadata = BuildRootNode(item, treePath, terms);
             var root = context.CreateDocument(metadata, "", "text/html");
-            return root.Yield();
+            return await root.YieldAsync();
         }
 
         private static IList<KeyValuePair<string, object>> BuildRootNode(ITaxonomyGroup item, string[] treePath, IEnumerable<IDocument> terms)

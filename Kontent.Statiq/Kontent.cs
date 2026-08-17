@@ -79,7 +79,7 @@ namespace Kontent.Statiq
 
                 if (items.Items == null || items.Items.Count == 0)
                 {
-                    context.Logger.LogWarning($"Query for {typeof(TContentModel).Name} returned no results.");
+                    context.Logger.LogWarning("Query for {ContentType} returned no results.", typeof(TContentModel).Name);
                 }
 
                 return items.Items?.Select(item => KontentDocumentHelpers.CreateDocument(context, item, GetContent)).ToArray() ?? Array.Empty<IDocument>();

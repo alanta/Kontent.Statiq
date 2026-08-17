@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Every project writes a packages.lock.json, pinning the full transitive closure to
+         exact versions and content hashes. CI restores in locked mode, so a dependency
+         that resolves differently than what was committed fails the build instead of
+         shipping silently. After any package change, regenerate the lock files with a
+         restore that passes the force-evaluate switch, and commit them in the same
+         commit as the version change. See SECURITY_GUIDELINES.md section 2.1. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Local builds pack as a prerelease, the same as every version this repo publishes
+         (GitVersion tags main as beta). Without this a bare 'dotnet build' falls back to the
+         SDK default 1.0.0, which is stable, and packing a stable version against the
+         prerelease Statiq packages warns NU5104. CI and release builds pass -p:Version, which
+         overrides this. Suffix only, so there is no version number here to go stale. -->
+    <VersionSuffix>local</VersionSuffix>
+  </PropertyGroup>
+
+</Project>

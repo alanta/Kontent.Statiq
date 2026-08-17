@@ -20,3 +20,4 @@ indent_size = 2
 # version, which is exactly what the attribute is for. The rule only reminds us that
 # the members are still there, so it has nothing to report on a build.
 dotnet_diagnostic.S1133.severity = none
+

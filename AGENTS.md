@@ -20,6 +20,9 @@ Repo: https://github.com/alanta/Kontent.Statiq · License: MIT · Package: `Kont
 | `docs/` | Design notes explaining *why* something is built the way it is, for decisions that look like they could be simplified away. Not user-facing docs — those go in `README.md`. |
 | `.github/workflows/` | `ci.yml` (build+test on push), `release.yml` (tag `v*` → draft GitHub release), `publish.yml` (release published → push to nuget.org). |
 | `GitVersion.yml` | Version is derived from git history by GitVersion — never hard-code a version in a csproj. |
+| `Directory.Packages.props` | Every package version, centrally. A `PackageReference` must not carry a `Version`. |
+| `Directory.Build.props` | `RestorePackagesWithLockFile` and the local `VersionSuffix`. |
+| `nuget.config` | Sources are cleared and mapped to nuget.org only — don't add a feed without review. |
 | `README.md` | The user-facing docs *and* the NuGet package readme (`PackageReadmeFile`). Update it when public API changes. |
 
 Ignore `obj/`, `bin/`, `.vs/`, `_NCrunch_Kontent.Statiq/` — build/IDE leftovers, already gitignored.
@@ -49,24 +52,55 @@ dotnet build Kontent.Statiq.sln -c Debug
 dotnet test Kontent.Statiq.sln -c Debug --no-build
 ```
 
-Expected: build succeeds with warnings only; all tests pass (43 as of the last check).
+Expected: build succeeds **warning free**; all tests pass (43 as of the last check).
 
 If only a newer SDK/runtime is installed, the build still works (targeting packs come from NuGet)
 but the test host will not start. Either install the .NET 8 runtime or run the tests with
 `DOTNET_ROLL_FORWARD=LatestMajor dotnet test ...`.
 
 Notes:
-- `GeneratePackageOnBuild` is on, so every build packs a `.nupkg` — the `NU5104` warning
-  (stable package with prerelease Statiq dependency) is expected and harmless.
-- SonarAnalyzer runs as part of the build and the build is warning free — keep it that way.
-  `S1133` ("remove this deprecated code someday") is turned off in `.editorconfig` because this
-  library deliberately marks public API `[Obsolete]` before removing it in a major version.
-- `NU5104` (stable package with a prerelease Statiq dependency) only appears when you build
-  without specifying a version, because the version then defaults to a stable `1.0.0`. Released
-  builds pass `-p:Version=` with a prerelease version and don't hit it.
-- Statiq packages are referenced as `1.0.0-*` (floating prerelease). Statiq 1.0 has been in
-  beta for years; `beta.72` is the newest and it targets netcoreapp3.1, so it does not constrain
+- `GeneratePackageOnBuild` is on, so every build packs a `.nupkg`. `Directory.Build.props` sets
+  `VersionSuffix=local` so that package is a prerelease like every version this repo publishes —
+  otherwise the version defaults to a stable `1.0.0` and packing warns `NU5104` (stable package
+  with a prerelease Statiq dependency). Released builds pass `-p:Version=`, which overrides it.
+- Statiq packages are pinned to `1.0.0-beta.72`. Statiq 1.0 has been in beta for years and has
+  published nothing since January 2024; beta.72 targets netcoreapp3.1, so it does not constrain
   which .NET version this library targets.
+
+### SonarAnalyzer
+
+SonarAnalyzer runs as part of the build and **the build is warning free — keep it that way.**
+SonarCloud also analyses pull requests; its rules come from the quality profile on Sonar's side,
+not from anything in this repo.
+
+Judge a finding before acting on it. If it describes a real defect, fix it. If it is a false
+positive, **suppress it at the site with a `#pragma warning disable Sxxxx` and a comment saying
+why** — do not reshape working code to satisfy a rule that is wrong. Two examples to copy:
+
+- `KontentAssetHelper.GetLocalFileName` — `S4790` (weak hash). The MD5 is a filename
+  discriminator, not a security control, and changing it would rename every published asset.
+- `KontentConfig.GetChildren` — `S2955` (null check on an unconstrained type parameter). The
+  alternatives are a comparison to `default` that reads worse, or a `where T : class` constraint
+  that changes a public signature.
+
+Reserve `.editorconfig` (`dotnet_diagnostic.Sxxxx.severity = none`) for a decision that genuinely
+applies repo-wide, with the reasoning in a comment above it. `S1133` ("remove this deprecated code
+someday") is off there because this library deliberately marks public API `[Obsolete]` before
+removing it in a major version. Turning a rule off globally to fix one call site gives away every
+place the rule would have been right.
+
+### Dependencies
+
+Versions live in `Directory.Packages.props` (central package management) and both projects commit a
+`packages.lock.json`. CI restores with `--locked-mode`, so **a package change and its regenerated
+lock files belong in the same commit**:
+
+```bash
+dotnet restore Kontent.Statiq.sln --force-evaluate
+```
+
+Skipping that fails CI with `NU1004`. Don't "fix" it by dropping `--locked-mode`. `nuget.config`
+pins the only package source to nuget.org. See SECURITY_GUIDELINES.md section 2.
 
 ## Line endings — read this before committing
 

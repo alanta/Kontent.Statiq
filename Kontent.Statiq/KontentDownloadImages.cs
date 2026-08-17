@@ -53,15 +53,21 @@ namespace Kontent.Statiq
             // concurrent requests and backing off on all of them at once.
             foreach (var module in childModules)
             {
-                var documents = await module!.ExecuteAsync(context);
+                var documents = await module.ExecuteAsync(context);
                 downloads.AddRange(documents);
             }
+
+            // Index the assets by url so matching a download is a lookup instead of a scan of
+            // every asset. DistinctBy keeps the first asset for a url - the same url can be
+            // written to more than one local path - which is what a linear search would return.
+            var assetsByUrl = assets
+                .DistinctBy(asset => asset.OriginalUrl)
+                .ToDictionary(asset => asset.OriginalUrl);
 
             foreach (var download in downloads)
             {
                 var downloadedUrl = download.Get<string>(Keys.SourceUri);
-                var asset = Array.Find(assets, a => a.OriginalUrl == downloadedUrl);
-                if (asset != null)
+                if (downloadedUrl != null && assetsByUrl.TryGetValue(downloadedUrl, out var asset))
                 {
                     var data = new CachedImage(Data: await download.GetContentBytesAsync(),
                         MediaType: download.ContentProvider.MediaType);

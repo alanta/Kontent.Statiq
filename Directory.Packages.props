@@ -12,7 +12,7 @@
          for commercial use. Stay on 7.x. -->
     <PackageVersion Include="FluentAssertions" Version="7.2.2" />
     <PackageVersion Include="Kontent.Ai.Delivery" Version="18.3.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="RichardSzalay.MockHttp" Version="7.1.0" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.32.0.713" />
     <!-- Statiq has not published since January 2024. These were floating 1.0.0-*, which

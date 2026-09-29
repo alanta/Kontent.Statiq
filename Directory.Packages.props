@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
     <PackageVersion Include="FakeItEasy" Version="9.0.1" />
     <!-- Version 8 moved to the Xceed Community License, which requires a paid licence
          for commercial use. Stay on 7.x. -->
